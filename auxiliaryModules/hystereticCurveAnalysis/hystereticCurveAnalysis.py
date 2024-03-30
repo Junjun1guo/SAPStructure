@@ -31,7 +31,7 @@ class HystereticCurveAnalysis():
 	    **                                                                                   **
 	    ** Developed by:                                                                     **
 	    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo           **
-	    **   guojj@tongji.edu.cn/guojj_ce@163.com                                            **
+	    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                             **
 	    ** ********************************************************************************  **
 	"""
 	def __init__(self,xDataList,yDataList):

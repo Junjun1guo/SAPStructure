@@ -2,9 +2,9 @@
 #####Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2
 #####Units: Length-mm, Force-N, mass-ton, Stress-Mpa, g=9810mm/s2 pho=ton/mm3
 ########################################################################################################################
-#  Author: Junjun Guo,Tongji University. https://github.com/Junjun1guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
-#  Environemet: Successfully executed in python 3.8
+#  Author: Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#  Environemet: Successfully executed in python 3.11
 #  Date: 2022-01-29
 ########################################################################################################################
 ########################---import modules---#################################

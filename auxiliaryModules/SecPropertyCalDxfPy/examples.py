@@ -1,7 +1,7 @@
 # -*-coding: UTF-8-*-
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com/guojj01@gmail.com
-#  Environemet: Successfully excucted in python 3.8
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#  Environemet: Successfully excucted in python 3.11
 #  Date: 2021.04.27
 # import necessary modules
 from SecPropertyCalDxfPy import SecPropertyCalDxfPy

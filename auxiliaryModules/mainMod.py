@@ -2,9 +2,9 @@
 #####Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2
 #####Units: Length-mm, Force-N, mass-ton, Stress-Mpa, g=9810mm/s2 pho=ton/mm3
 ########################################################################################################################
-#  Author: Junjun Guo,Tongji University. https://github.com/Junjun1guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
-#  Environemet: Successfully executed in python 3.8
+#  Author: Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#  Environemet: Successfully executed in python 3.11
 #  Date: 2022-01-29
 ########################################################################################################################
 ########################---import modules---#################################
@@ -25,16 +25,16 @@ class SectionFiberDivide():
     --------------------------------------------------------------------------------------------------------------------
     A class for section fiber divide
     --------------------------------------------------------------------------------------------------------------------
-    ** **********************************************************************  **
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-    **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     """
     def __init__(self,saveFold="fiberDivideInformation"):
@@ -247,22 +247,22 @@ class SectionFiberDivide():
 def OpenSeesPyX(dataBaseName="resultDB"):
     """
     --------------------------------------------------------------------------------------------------------------------
-    A function for openSeesPy visualization and structural model analysis (version:0.4.0)
-    Environemet: Successfully executed in python 3.8
+    A function for openSeesPy visualization and structural model analysis (version:0.1.0)
+    Environemet: Successfully executed in python 3.11
     Date: 2023-04-07
     --------------------------------------------------------------------------------------------------------------------
     Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2
     --------------------------------------------------------------------------------------------------------------------
-        ** **********************************************************************  **
-        ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-        ** All Rights Reserved.                                                    **
-        **                                                                         **
-        ** Commercial use of this program is strictly prohibited.                  **
-        **                                                                         **
-        ** Developed by:                                                           **
-        **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-        **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-        ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     """
     from .OpenSeesPyX.OpenSeesPyX import OpenSeesPyX
     return OpenSeesPyX(dataBaseName=dataBaseName)
@@ -277,16 +277,16 @@ class SectionPropertyCalculate():
     Robbie van Leeuwen. sectionproperties can be used to determine section properties to be used in structural
     design and visualise cross-sectional stresses resulting from combinations of applied forces and bending moments.
     --------------------------------------------------------------------------------------------------------------------
-    ** **********************************************************************  **
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-    **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     """
     def __init__(self):
@@ -376,16 +376,16 @@ class CalculateGroundMotionIMs():
         cable-stayed bridge based on generalized linear regression models. Soil Dynamics and Earthquake Engineering.
         2020 Apr 1;131:106024.
     --------------------------------------------------------------------------------------------------------------------
-    ** **********************************************************************  **
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-    **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     ###---Example
     acc=np.loadtxt("1.txt")
@@ -420,16 +420,16 @@ class GroundMotionProcess():
     --------------------------------------------------------------------------------------------------------------------
     A class for ground motion process
     --------------------------------------------------------------------------------------------------------------------
-    ** **********************************************************************  **
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-    **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     """
     def __init__(self):
@@ -740,19 +740,16 @@ class SectMCAnalysis():
     --------------------------------------------------------------------------------------------------------------------
     A class for section moment curvature analysis
     --------------------------------------------------------------------------------------------------------------------
-    ** **********************************************************************  **
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **  1. Penghui Zhang, Tongji University, https://github.com/Penghui0616    **
-    **     penghui@tongji.edu.cn                                               **
-    **  2. Junjun Guo,Tongji University. https://github.com/Junjun1guo         **
-    **     guojj@tongji.edu.cn/guojj_ce@163.com                                **
-    ** *********************************************************************   **
-
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     """
     def __init__(self,saveFolderName,fiberFolderName,fiberSectName,coverFiber,coreFiber,barFiber,barMaterial,
@@ -920,15 +917,16 @@ class ExciteAnyDirectionOpenSees():
     --------------------------------------------------------------------------------------------------------------------
     A class for ground motion excite OpenSeesPy model in any direction
     --------------------------------------------------------------------------------------------------------------------
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **     Junjun Guo,Tongji University. https://github.com/Junjun1guo         **
-    **     guojj@tongji.edu.cn/guojj_ce@163.com                                **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     """
     def __init__(self,rotateAngle=0):
         """
@@ -1056,15 +1054,16 @@ class PythonInteractSAP2000():
     --------------------------------------------------------------------------------------------------------------------
     A class for python interact with SAP2000
     --------------------------------------------------------------------------------------------------------------------
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **     Junjun Guo,Tongji University. https://github.com/Junjun1guo         **
-    **     guojj@tongji.edu.cn/guojj_ce@163.com                                **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     ####---注意：需要首先打开软件，且确保只有一个软件在运行
     ####---查看任务管理器，详细信息里面查看是否有多个SAP2000程序在运行，关闭其他的
@@ -1094,15 +1093,16 @@ class ShakeTableTest():
     --------------------------------------------------------------------------------------------------------------------
     A class for processing shake table test data
     --------------------------------------------------------------------------------------------------------------------
-    ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **     Junjun Guo,Tongji University. https://github.com/Junjun1guo         **
-    **     guojj@tongji.edu.cn/guojj_ce@163.com                                **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     ###---Example
     --------------------------------------------------------------------------------------------------------------------
@@ -1327,15 +1327,16 @@ class HystereticCurveAnalysis():
     --------------------------------------------------------------------------------------------------------------------
     A class for analyzing the force-displacement hysteretic loops
     --------------------------------------------------------------------------------------------------------------------
-    ** (C) Copyright 2024, Department of Bridge Engineering,Tongji University  **
-    ** All Rights Reserved.                                                    **
-    **                                                                         **
-    ** Commercial use of this program is strictly prohibited.                  **
-    **                                                                         **
-    ** Developed by:                                                           **
-    **     Junjun Guo,Tongji University. https://github.com/Junjun1guo         **
-    **     guojj@tongji.edu.cn/guojj_ce@163.com                                **
-    ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     ###---Example
     --------------------------------------------------------------------------------------------------------------------
@@ -1398,16 +1399,16 @@ class EleMeshPlotAndSelect():
     --------------------------------------------------------------------------------------------------------------------
     Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2
     --------------------------------------------------------------------------------------------------------------------
-        ** **********************************************************************  **
-        ** (C) Copyright 2024, Department of Bridge Engineering,Tongji University  **
-        ** All Rights Reserved.                                                    **
-        **                                                                         **
-        ** Commercial use of this program is strictly prohibited.                  **
-        **                                                                         **
-        ** Developed by:                                                           **
-        **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-        **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-        ** *********************************************************************   **
+    ** **************************************************************************** **
+    ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
     --------------------------------------------------------------------------------------------------------------------
     ###---Example
 

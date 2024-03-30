@@ -1,8 +1,8 @@
 ######################################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 #    Date: 1/16/2021
-#  Environemet: Successfully excucted in python 3.8
+#  Environemet: Successfully excucted in python 3.11
 ######################################################################################
 from sectionFiberMain import polygonSection
 name="polygonWithHole"

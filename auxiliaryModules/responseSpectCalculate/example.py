@@ -1,9 +1,9 @@
 #-*-coding: UTF-8-*-
 #########################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 #    Date: 25/02/2019
-#  Environemet: Successfully excucted in python 2.7
+#  Environemet: Successfully excucted in python 3.11
 #########################################################################
 import os
 import numpy as np

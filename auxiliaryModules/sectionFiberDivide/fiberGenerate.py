@@ -1,7 +1,7 @@
 #-*-coding: UTF-8-*-
 ######################################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 #  Date: 05/02/2020
 ######################################################################################
 # import necessary modules

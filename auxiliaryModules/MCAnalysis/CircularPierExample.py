@@ -1,8 +1,8 @@
 ######################################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
-#    Date: 05/02/2020
-#  Environemet: Successfully excucted in python 3.6
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#  Date: 05/02/2020
+#  Environemet: Successfully excucted in python 3.11
 ######################################################################################
 import os
 import numpy as np

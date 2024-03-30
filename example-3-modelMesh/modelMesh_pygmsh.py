@@ -1,9 +1,9 @@
 #-*-coding: UTF-8-*-
 #####Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2 pho=ton/mm3
 ########################################################################################################################
-#  Author: Junjun Guo,Tongji University. https://github.com/Junjun1guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
-#  Environemet: Successfully executed in python 3.8
+#  Author: Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#  Environemet: Successfully executed in python 3.11
 #  Date: 2023-04-03
 ########################################################################################################################
 ########################---import modules---#################################
@@ -1697,7 +1697,7 @@ def example_58_mesh_translations():
 if __name__ == "__main__":
     #############################################################################
     ####---example_1_mesh
-    # example_1_mesh_polygon()
+    example_1_mesh_polygon()
     #############################################################################
     ####---example_2_mesh
     # example_2_mesh_circle()

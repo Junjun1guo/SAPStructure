@@ -1,8 +1,8 @@
 ######################################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 #    Date: 05/02/2020
-#  Environemet: Successfully excucted in python 3.8
+#  Environemet: Successfully excucted in python 3.11
 ######################################################################################
 import matplotlib.pyplot as plt
 from .fiberGenerate import CircleSection,PolygonSection,figureSize

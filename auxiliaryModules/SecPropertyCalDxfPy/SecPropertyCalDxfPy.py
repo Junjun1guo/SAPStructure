@@ -1,8 +1,8 @@
 #-*-coding: UTF-8-*-
 #########################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com/guojj01@gmail.com
-#  Environemet: Successfully executed in python 3.8
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#  Environemet: Successfully executed in python 3.11
 #  Date: 2021-08-12
 #########################################################################
 #import necessary modules

@@ -1,6 +1,6 @@
 ########################################################################################################################
 #  Author: Junjun Guo
-#  E-mail: guojj@tongji.edu.cn/guojj_ce@163.com
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 #    Date: 05/02/2020
 ########################################################################################################################
 import os
@@ -14,22 +14,22 @@ from .SqliteDB import SqliteDB  ##sqlite database to store opensees results
 class OpenSeesPyX():
     """
     --------------------------------------------------------------------------------------------------------------------
-    A class for openSeesPy visualization and structural model analysis (version:0.4.0)
-    Environemet: Successfully executed in python 3.8
+    A class for openSeesPy visualization and structural model analysis (version:0.1.0)
+    Environemet: Successfully executed in python 3.11
     Date: 2023-04-07
     --------------------------------------------------------------------------------------------------------------------
     Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2
     --------------------------------------------------------------------------------------------------------------------
-        ** **********************************************************************  **
-        ** (C) Copyright 2023, Department of Bridge Engineering,Tongji University  **
-        ** All Rights Reserved.                                                    **
-        **                                                                         **
-        ** Commercial use of this program is strictly prohibited.                  **
-        **                                                                         **
-        ** Developed by:                                                           **
-        **   Junjun Guo,Tongji University. https://github.com/Junjun1guo           **
-        **   guojj@tongji.edu.cn/guojj_ce@163.com                                  **
-        ** *********************************************************************   **
+        ** **************************************************************************** **
+        ** (C) Copyright 2024, School of Civil Engineering,Beijing Jiaotong University  **
+        ** All Rights Reserved.                                                         **
+        **                                                                              **
+        ** Commercial use of this program is strictly prohibited.                       **
+        **                                                                              **
+        ** Developed by:                                                                **
+        **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+        **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+        ** **************************************************************************** **
     """
     def __init__(self,dataBaseName):
         """
