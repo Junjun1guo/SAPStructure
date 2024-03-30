@@ -6,7 +6,7 @@ E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 ##########################################################################
 ______
 - [Tutorial-1:Auxiliary modules](#Tutorials-1)
-- [Tutorial-2:Install SAPBridge and view OpenSeesPy model](#Tutorials-2)
+- [Tutorial-2:Install SAPStructure and view OpenSeesPy model](#Tutorials-2)
 - [Tutorial-3:Quickly generate model nodes and elements with AutoCAD dxf file](#Tutorial-3)
 - [Tutorial-4:2D soil profile meshing  with AutoCAD dxf file](#Tutorial-4)
 ______
