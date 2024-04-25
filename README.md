@@ -59,17 +59,17 @@ ______
 4. Clicking the "generateModel" button to automatically generate the model nodes and elements, and save them into the model database and txt files in the selected folder.
 5. Go to the main windown of SAPStructure, clicking the button "loadModelDB" to load the generated model database, and display the model, see Figures 2.3 and 2.4. In addition, the model can be visualized with node and element tags, see Figures 2.5 and 2.6.
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/quicklyGenerateModel-1.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.1 </p>
+<p align="center">Figure 3.1 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/dxfModel.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.2 </p>
+<p align="center">Figure 3.2 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/quickModel.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.3 </p>
+<p align="center">Figure 3.3 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modelNodesElements.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.4 </p>
+<p align="center">Figure 3.4 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modelNodesElementsStr.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.5 </p>
+<p align="center">Figure 3.5 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modelNodesElementsInt.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.6 </p>      
+<p align="center">Figure 3.6 </p>      
 
 ______
 ## Tutorial-4      
