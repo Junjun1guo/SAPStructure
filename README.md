@@ -100,12 +100,12 @@ ______
 2. The input parameters:   
 faultType: type of faulting,including ["strikeSlip","reverseAndReverseOblique"]  
 simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]  
-momentMag: moment magnitude of an Earthquake
-zTOR(km): depth to the top of the rupture plane in kilometers
-Rrup(km): the closest distance from the site to the fault rupture in kilometers
-Vs30(m/s): site soil shear wave average velocity over the top 30 meters in meters per second
-s_or_d(km): directivity parameters s or d (input the large of s and d)
-theta_or_phi(degrees): directivity angle theta or phi (input corresponding to s_or_d)
+momentMag: moment magnitude of an Earthquake  
+zTOR(km): depth to the top of the rupture plane in kilometers  
+Rrup(km): the closest distance from the site to the fault rupture in kilometers  
+Vs30(m/s): site soil shear wave average velocity over the top 30 meters in meters per second  
+s_or_d(km): directivity parameters s or d (input the large of s and d)  
+theta_or_phi(degrees): directivity angle theta or phi (input corresponding to s_or_d)  
 numSimMotions(int): the number of simulated ground motion time histories  
 
 
