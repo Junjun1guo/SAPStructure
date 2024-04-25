@@ -1,4 +1,4 @@
-# SAPStructure (Version 0.1.0)
+# SAPStructure (Version 0.2.0)
 Seismic analysis platform for structures   
 ##########################################################################    
 Author: Junjun Guo([HomePage](https://github.com/Junjun1guo))    
@@ -9,6 +9,7 @@ ______
 - [Tutorial-2:Install SAPStructure and view OpenSeesPy model](#Tutorials-2)
 - [Tutorial-3:Quickly generate model nodes and elements with AutoCAD dxf file](#Tutorial-3)
 - [Tutorial-4:2D soil profile meshing  with AutoCAD dxf file](#Tutorial-4)
+- [Tutorial-5:Near fault ground motion simulation](#Tutorial-5)
 ______
 ### Notes: compatible modules: records==0.5.3, sQLAlchemy==1.3.20    
 
@@ -88,3 +89,7 @@ ______
 <p align="center">Figure 3.2 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileRegionMesh.jpg" width =100% height =100% div align="center">
 <p align="center">Figure 3.3 </p>
+
+______
+## Tutorial-5      
+### Near fault ground motion simulation (x and y components)
