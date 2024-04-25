@@ -97,7 +97,7 @@ ______
 ### Near fault ground motion simulation (x and y components)
 1. The near_fault ground motions are simulated based on the method proposed by Dabaghi and Der Kiureghian((2014 PEER report) "Stochastic Modeling and Simulation of Near-Fault Ground Motions for
 	   Performance-Based Earthquake Engineering)
-2. The input parameters:
+2. The input parameters:   
 2.1 faultType(str): type of faulting,including ["strikeSlip","reverseAndReverseOblique"]       			
 2.2 simulationType(str): type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]       			
 2.3 momentMag(float): moment magnitude of an Earthquake       			
