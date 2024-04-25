@@ -95,6 +95,8 @@ ______
 ______
 ## Tutorial-5      
 ### Near fault ground motion simulation (x and y components)
+The near_fault ground motions are simulated based on the method proposed by Dabaghi and Der Kiureghian((2014 PEER report) "Stochastic Modeling and Simulation of Near-Fault Ground Motions for
+	   Performance-Based Earthquake Engineering)
 
 
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
