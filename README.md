@@ -98,8 +98,15 @@ ______
 1. The near_fault ground motions are simulated based on the method proposed by Dabaghi and Der Kiureghian((2014 PEER report) "Stochastic Modeling and Simulation of Near-Fault Ground Motions for
 	   Performance-Based Earthquake Engineering)
 2. The input parameters:   
-#### faultType: type of faulting,including ["strikeSlip","reverseAndReverseOblique"]  
-#### simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]	
+faultType: type of faulting,including ["strikeSlip","reverseAndReverseOblique"]  
+simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]
+momentMag: moment magnitude of an Earthquake
+zTOR(km): depth to the top of the rupture plane in kilometers
+Rrup(km): the closest distance from the site to the fault rupture in kilometers
+Vs30(m/s): site soil shear wave average velocity over the top 30 meters in meters per second
+s_or_d(km): directivity parameters s or d (input the large of s and d)
+theta_or_phi(degrees): directivity angle theta or phi (input corresponding to s_or_d)
+numSimMotions(int): the number of simulated ground motion time histories  
 
 
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
