@@ -98,9 +98,9 @@ ______
 1. The near_fault ground motions are simulated based on the method proposed by Dabaghi and Der Kiureghian((2014 PEER report) "Stochastic Modeling and Simulation of Near-Fault Ground Motions for
 	   Performance-Based Earthquake Engineering)
 2. The input parameters:
-   faultType(str): type of faulting,including ["strikeSlip","reverseAndReverseOblique"]       			
-   simulationType(str): type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]       			
-   momentMag(float): moment magnitude of an Earthquake       			
+2.1 faultType(str): type of faulting,including ["strikeSlip","reverseAndReverseOblique"]       			
+2.2 simulationType(str): type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]       			
+2.3 momentMag(float): moment magnitude of an Earthquake       			
    zTOR(float,km): depth to the top of the rupture plane in kilometers       			
    Rrup(float,km): the closest distance from the site to the fault rupture in kilometers       		
    Vs30(float,m/s): site soil shear wave average velocity over the top 30 meters in meters per second       			
