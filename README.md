@@ -99,7 +99,7 @@ ______
 	   Performance-Based Earthquake Engineering)
 2. The input parameters:   
 faultType: type of faulting,including ["strikeSlip","reverseAndReverseOblique"]  
-simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]
+simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]  
 momentMag: moment magnitude of an Earthquake
 zTOR(km): depth to the top of the rupture plane in kilometers
 Rrup(km): the closest distance from the site to the fault rupture in kilometers
