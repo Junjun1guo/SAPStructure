@@ -98,7 +98,8 @@ ______
 1. The near_fault ground motions are simulated based on the method proposed by Dabaghi and Der Kiureghian((2014 PEER report) "Stochastic Modeling and Simulation of Near-Fault Ground Motions for
 	   Performance-Based Earthquake Engineering)
 2. The input parameters:   
-2.1 faultType(str): type of faulting,including ["strikeSlip","reverseAndReverseOblique"]    			
+faultType: type of faulting,including ["strikeSlip","reverseAndReverseOblique"]
+simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]	
 
 
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
