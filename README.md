@@ -84,12 +84,18 @@ ______
 10. Finally, click "saveNodesEles" button to save the nodes and the elements of each soil region to the selected folder.
 
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileMeshPanel.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 3.1 </p>
+<p align="center">Figure 4.1 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileRectangleMesh.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 3.2 </p>
+<p align="center">Figure 4.2 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileRegionMesh.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 3.3 </p>
+<p align="center">Figure 4.3 </p>
 
 ______
 ## Tutorial-5      
 ### Near fault ground motion simulation (x and y components)
+
+
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
+<p align="center">Figure 5.1 </p>
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/velSpectra.jpg" width =100% height =100% div align="center">
+<p align="center">Figure 5.2 </p>
