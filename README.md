@@ -108,8 +108,9 @@ s_or_d(km): directivity parameters s or d (input the large of s and d)
 theta_or_phi(degrees): directivity angle theta or phi (input corresponding to s_or_d)  
 numSimMotions(int): the number of simulated ground motion time histories  
 
-
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/faultModel.jpg" width =100% height =100% div align="center">
 <p align="center">Figure 5.1 </p>
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/velSpectra.jpg" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
 <p align="center">Figure 5.2 </p>
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/velSpectra.jpg" width =100% height =100% div align="center">
+<p align="center">Figure 5.3 </p>
