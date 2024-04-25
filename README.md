@@ -5,15 +5,33 @@ Author: Junjun Guo([HomePage](https://github.com/Junjun1guo))
 E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com      
 ##########################################################################
 ______
-- [Tutorial-1:Auxiliary modules](#Tutorials-1)
-- [Tutorial-2:Install SAPStructure and view OpenSeesPy model](#Tutorials-2)
+- [Tutorial-1:Install SAPStructure and view OpenSeesPy model](#Tutorials-1)
+- [Tutorial-2:Auxiliary modules](#Tutorials-2)
 - [Tutorial-3:Quickly generate model nodes and elements with AutoCAD dxf file](#Tutorial-3)
 - [Tutorial-4:2D soil profile meshing  with AutoCAD dxf file](#Tutorial-4)
 - [Tutorial-5:Near fault ground motion simulation](#Tutorial-5)
 ______
 ### Notes: compatible modules: records==0.5.3, sQLAlchemy==1.3.20    
 
-## Tutorials-1
+
+______
+## Tutorials-1      
+### Install SAPStructure and view OpenSeesPy model
+1. Download the zip file
+2. Run the example model (eg. exmple 1)
+3. Download SAPStructure from https://fbs.sh/JunjunGuo/SAPStructure/SAPStructureSetup.exe, and install it
+4. When encounter error after installation, just close the window, and reopen it.
+5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
+6. Click loadResultDB button, and load the result database 
+7. Then display the model and conduct post process.     
+Prepare your own openseespy model by referring the examples       
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/model.JPG" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modeShape.JPG" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/shellWall.jpg" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/timeHistory.JPG" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/hysteretic.JPG" width =100% height =100% div align="center">
+
+## Tutorials-2
 ### Auxiliary modules
 1. #### CalculateGroundMotionIMs module
    a class for calculate ground motion intensity measure. please use the command print(help(CalculateGroundMotionIMs)) to check the structure and the usage of the    class
@@ -31,22 +49,6 @@ ______
    a class for python  interacting with the SAP2000 program.
 8. #### ShakeTableTest module
    a class for processing shake table test data, such as calculating the periods and damping ratios of a structure
-______
-## Tutorials-2      
-### Install SAPStructure and view OpenSeesPy model
-1. Download the zip file
-2. Run the example model (eg. exmple 1)
-3. Download SAPStructure from https://fbs.sh/JunjunGuo/SAPStructure/SAPStructureSetup.exe, and install it
-4. When encounter error after installation, just close the window, and reopen it.
-5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
-6. Click loadResultDB button, and load the result database 
-7. Then display the model and conduct post process.     
-Prepare your own openseespy model by referring the examples       
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/model.JPG" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modeShape.JPG" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/shellWall.jpg" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/timeHistory.JPG" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/hysteretic.JPG" width =100% height =100% div align="center">
 
 ______  
 ## Tutorial-3      
