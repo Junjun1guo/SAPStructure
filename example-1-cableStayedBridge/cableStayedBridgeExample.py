@@ -396,7 +396,7 @@ for i1 in range(9):
                 numbers0,numbers1,numbers2,numbers3,numbers4,numbers5, '-dir', 1, 2,3, 4,5, 6,'-orient', 0, 0, 1,
                 brTraf[i1][0], brTraf[i1][1], brTraf[i1][2]),
 ########################################################################################################################
-# opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPBridge中显示模型
+# opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 ########################################################################################################################
 ##########################################---施加重力荷载---##############################################################
 nodesTags=ops.getNodeTags()
@@ -433,7 +433,7 @@ recordList = [('node', 'disp', girderNodeList), ('node', 'disp', nodeRespList), 
               ('nonZeroEle', 'localForce', [41001, 41018, 41019])]
 ########################################################################################################################
 start=time()
-opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPBridge中显示模型
+opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 end=time()
 print("写入数据库时间为:",end-start)
 ########################################################################################################################
