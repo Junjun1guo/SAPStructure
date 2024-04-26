@@ -1,18 +1,37 @@
-# SAPStructure (Version 0.1.0)
+# SAPStructure (Version 0.2.0)
 Seismic analysis platform for structures   
 ##########################################################################    
 Author: Junjun Guo([HomePage](https://github.com/Junjun1guo))    
 E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com      
 ##########################################################################
 ______
-- [Tutorial-1:Auxiliary modules](#Tutorials-1)
-- [Tutorial-2:Install SAPStructure and view OpenSeesPy model](#Tutorials-2)
+- [Tutorial-1:Install SAPStructure and view OpenSeesPy model](#Tutorials-1)
+- [Tutorial-2:Auxiliary modules](#Tutorials-2)
 - [Tutorial-3:Quickly generate model nodes and elements with AutoCAD dxf file](#Tutorial-3)
 - [Tutorial-4:2D soil profile meshing  with AutoCAD dxf file](#Tutorial-4)
+- [Tutorial-5:Near fault ground motion simulation](#Tutorial-5)
 ______
 ### Notes: compatible modules: records==0.5.3, sQLAlchemy==1.3.20    
 
-## Tutorials-1
+
+______
+## Tutorials-1      
+### Install SAPStructure and view OpenSeesPy model
+1. Download the zip file
+2. Run the example model (eg. exmple 1)
+3. Download SAPStructure from https://www.yunpan.com/surl_yGITQX7rEtu （code：572b）)
+4. When encounter error after installation, just close the window, and reopen it.
+5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
+6. Click loadResultDB button, and load the result database 
+7. Then display the model and conduct post process.     
+Prepare your own openseespy model by referring the examples       
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/model.JPG" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modeShape.JPG" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/shellWall.jpg" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/timeHistory.JPG" width =100% height =100% div align="center">
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/hysteretic.JPG" width =100% height =100% div align="center">
+
+## Tutorials-2
 ### Auxiliary modules
 1. #### CalculateGroundMotionIMs module
    a class for calculate ground motion intensity measure. please use the command print(help(CalculateGroundMotionIMs)) to check the structure and the usage of the    class
@@ -30,22 +49,6 @@ ______
    a class for python  interacting with the SAP2000 program.
 8. #### ShakeTableTest module
    a class for processing shake table test data, such as calculating the periods and damping ratios of a structure
-______
-## Tutorials-2      
-### Install SAPStructure and view OpenSeesPy model
-1. Download the zip file
-2. Run the example model (eg. exmple 1)
-3. Download SAPStructure from https://fbs.sh/JunjunGuo/SAPStructure/SAPStructureSetup.exe, and install it
-4. When encounter error after installation, just close the window, and reopen it.
-5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
-6. Click loadResultDB button, and load the result database 
-7. Then display the model and conduct post process.     
-Prepare your own openseespy model by referring the examples       
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/model.JPG" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modeShape.JPG" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/shellWall.jpg" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/timeHistory.JPG" width =100% height =100% div align="center">
-<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/hysteretic.JPG" width =100% height =100% div align="center">
 
 ______  
 ## Tutorial-3      
@@ -56,17 +59,17 @@ ______
 4. Clicking the "generateModel" button to automatically generate the model nodes and elements, and save them into the model database and txt files in the selected folder.
 5. Go to the main windown of SAPStructure, clicking the button "loadModelDB" to load the generated model database, and display the model, see Figures 2.3 and 2.4. In addition, the model can be visualized with node and element tags, see Figures 2.5 and 2.6.
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/quicklyGenerateModel-1.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.1 </p>
+<p align="center">Figure 3.1 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/dxfModel.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.2 </p>
+<p align="center">Figure 3.2 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/quickModel.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.3 </p>
+<p align="center">Figure 3.3 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modelNodesElements.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.4 </p>
+<p align="center">Figure 3.4 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modelNodesElementsStr.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.5 </p>
+<p align="center">Figure 3.5 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/modelNodesElementsInt.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 2.6 </p>      
+<p align="center">Figure 3.6 </p>      
 
 ______
 ## Tutorial-4      
@@ -83,8 +86,31 @@ ______
 10. Finally, click "saveNodesEles" button to save the nodes and the elements of each soil region to the selected folder.
 
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileMeshPanel.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 3.1 </p>
+<p align="center">Figure 4.1 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileRectangleMesh.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 3.2 </p>
+<p align="center">Figure 4.2 </p>
 <img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/soilProfileRegionMesh.jpg" width =100% height =100% div align="center">
-<p align="center">Figure 3.3 </p>
+<p align="center">Figure 4.3 </p>
+
+______
+## Tutorial-5      
+### Near fault ground motion simulation (x and y components)
+1. The near_fault ground motions are simulated based on the method proposed by Dabaghi and Der Kiureghian((2014 PEER report) "Stochastic Modeling and Simulation of Near-Fault Ground Motions for
+	   Performance-Based Earthquake Engineering)
+2. The input parameters:   
+faultType: type of faulting,including ["strikeSlip","reverseAndReverseOblique"]  
+simType: type of simulatated grond motions, including ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]  
+momentMag: moment magnitude of an Earthquake  
+zTOR(km): depth to the top of the rupture plane in kilometers  
+Rrup(km): the closest distance from the site to the fault rupture in kilometers  
+Vs30(m/s): site soil shear wave average velocity over the top 30 meters in meters per second  
+s_or_d(km): directivity parameters s or d (input the large of s and d)  
+theta_or_phi(degrees): directivity angle theta or phi (input corresponding to s_or_d)  
+numSimMotions(int): the number of simulated ground motion time histories  
+
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/faultModel.jpg" width =100% height =100% div align="center">
+<p align="center">Figure 5.1 </p>
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/accelSpectra.jpg" width =100% height =100% div align="center">
+<p align="center">Figure 5.2 </p>
+<img src="https://github.com/Junjun1guo/SAPStructure/blob/main/figures/velSpectra.jpg" width =100% height =100% div align="center">
+<p align="center">Figure 5.3 </p>
