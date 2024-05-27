@@ -2265,6 +2265,7 @@ class OpenSeesPyX():
             if deltaT<currentDt:
                 if len(set(deltaTList[-400:]))==1:
                     deltaT=deltaT*2
+                    deltaTList.append(deltaT)
                     print("The initial dt is:", currentDt, ", and the increase current dt is:", deltaT)
                 if deltaT>=currentDt:
                     deltaT=currentDt
