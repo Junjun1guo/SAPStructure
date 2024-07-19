@@ -19,7 +19,7 @@ ______
 ### Install SAPStructure and view OpenSeesPy model
 1. Download the zip file
 2. Run the example model (eg. exmple 1)
-3. Download SAPStructure from (https://www.yunpan.com/surl_yGNgf2BXaD9 （code：b00f）)
+3. Download SAPStructure from (https://www.yunpan.com/surl_yGNgf2BXaD9 （code：b00f）) or (https://drive.google.com/file/d/1qRovfA5kCcRkKkifJXYBlciovm06GX9c/view?usp=drive_link)
 4. When encounter error, just close the window, and reopen it.
 5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
 6. Click loadResultDB button, and load the result database 
