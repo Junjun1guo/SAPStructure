@@ -2217,6 +2217,7 @@ class OpenSeesPyX():
         ######################################################
         #######################################################
         writeInterNum=200 ###---每200时间步将结果写入数据库一次
+        recordList=recordList[0]
         if recordList!=None:
             nodeDict={}
             trussEleResponseDict={}
@@ -2299,6 +2300,7 @@ class OpenSeesPyX():
                               ] for eachkey in nodeKeys]
                             for eachkey in nodeKeys:
                                 nodeDict[eachkey] = []
+
                         [[resType:=eachkey.split('_')[1],nodeTag:=eachkey.split('_')[2],tempValue1:=[round(tCurrent,4)],
                           tempValue2:=eval(f"ops.{nodeResNameDict[resType]}({nodeTag})"),
                             tempValue3:=[round(tempValue2[i1],6) for i1 in range(3)],

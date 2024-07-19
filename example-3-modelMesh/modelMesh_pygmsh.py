@@ -1697,7 +1697,7 @@ def example_58_mesh_translations():
 if __name__ == "__main__":
     #############################################################################
     ####---example_1_mesh
-    example_1_mesh_polygon()
+    # example_1_mesh_polygon()
     #############################################################################
     ####---example_2_mesh
     # example_2_mesh_circle()
@@ -1823,7 +1823,7 @@ if __name__ == "__main__":
     # example_42_mesh_booleanUnion()
     #############################################################################
     ####---example_43_mesh
-    # example_43_mesh_booleanIntersection()
+    example_43_mesh_booleanIntersection()
     #############################################################################
     ####---example_44_mesh
     # example_44_mesh_booleanDifference()
