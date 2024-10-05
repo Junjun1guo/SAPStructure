@@ -284,7 +284,7 @@ class SecPropertyCalDxfPy():
                 for eachPoints in pointVector:
                     pointsList.append([round(eachPoints[0], 6), round(eachPoints[1], 6)])
                     points.append([round(eachPoints[0], 6), round(eachPoints[1], 6)])
-                for i2 in range(len(pointsList)):
+                for i2 in range(len(pointsList)-1):
                     startP = [round(pointsList[i2][0], 6), round(pointsList[i2][1], 6)]
                     endP = [round(pointsList[i2 + 1][0], 6), round(pointsList[i2 + 1][1], 6)]
                     eachLineIJCoord.append([startP, endP])
@@ -335,30 +335,19 @@ class SecPropertyCalDxfPy():
         try:
             arcEntity = self.msp.query(f"""ARC[layer=="{layerName}"]""")
             for each in arcEntity:
-                centerPoint=each.dxf.center
-                arcRadius=each.dxf.radius
-                arcStartPoint=each.start_point
-                arcEndPoint=each.end_point
-                arcStartAngle=each.dxf.start_angle
-                arcEndAngle=each.dxf.end_angle
-                deltaAngle=(arcEndAngle-arcStartAngle)/numArcSeg
-                arcPointList = []
-                arcPointList.append([round(arcStartPoint[0],6),round(arcStartPoint[1],6)])
-                for i3 in range(numArcSeg):
-                    angles=(arcStartAngle+(i3+1)*deltaAngle)
-                    sinValue = math.sin(angles * 3.1415926 / 180.0)
-                    cosValue = math.cos(angles * 3.1415926 / 180.0)
-                    pointY = centerPoint[0] + arcRadius * cosValue
-                    pointZ = centerPoint[1] + arcRadius * sinValue
-                    arcPointList.append([round(pointY,6),round(pointZ,6)])
-                    points.append([round(pointY, 6), round(pointZ, 6)])
-                arcPointList.append([round(arcEndPoint[0],6),round(arcEndPoint[1],6)])
-                for i4 in range(len(arcPointList)-1):
-                    startP = [round(arcPointList[i4][0], 6), round(arcPointList[i4][1], 6)]
-                    endP = [round(arcPointList[i4 + 1][0], 6), round(arcPointList[i4 + 1][1], 6)]
+                eachSpline=each.to_spline(replace=True)
+                pointsList = []
+                pointVector = [eachValue for eachValue in eachSpline.flattening(1e8,numSplineSeg)]
+                for eachPoints in pointVector:
+                    pointsList.append([round(eachPoints[0], 6), round(eachPoints[1], 6)])
+                    points.append([round(eachPoints[0], 6), round(eachPoints[1], 6)])
+                for i2 in range(len(pointsList)-1):
+                    startP = [round(pointsList[i2][0], 6), round(pointsList[i2][1], 6)]
+                    endP = [round(pointsList[i2 + 1][0], 6), round(pointsList[i2 + 1][1], 6)]
                     eachLineIJCoord.append([startP, endP])
         except:
             pass
+
         #####################################
         # process LWPOLYLINE object
         try:
