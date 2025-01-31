@@ -159,8 +159,8 @@ opsX.node(55, 1.0, 2.0, 0)
 # ELEMENTS
 ##########################
 
-ShellType = "ShellNLDKGQ"
-# ShellType = "ShellMITC4"
+# ShellType = "ShellNLDKGQ"
+ShellType = "ShellMITC4"
 
 opsX.element(ShellType, 1, 1, 2, 7, 6, 1)
 opsX.element(ShellType, 2, 2, 3, 8, 7, 2)

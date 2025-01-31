@@ -9,7 +9,7 @@ import openseespy.opensees as ops
 import time
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Polygon, Wedge
-from .SqliteDB import SqliteDB  ##sqlite database to store opensees results
+from .h5pyDB import h5pyDB  ##h5py database to store opensees results
 ########################################################################################################################
 class OpenSeesPyX():
     """
@@ -50,9 +50,10 @@ class OpenSeesPyX():
         self.nodeLinkDict={}
         self.eleLinkDict={}
         self.nodeMassDict={}
-        self.dbPath = dataBaseName+".db"
-        self.saveInstance = SqliteDB(self.dbPath)
-        SqliteDB.initDB(self.dbPath)
+        self.zeroEleDirDict={}
+        self.dbPath = dataBaseName+".h5"
+        self.saveInstance = h5pyDB(self.dbPath)
+        h5pyDB.initDB(self.dbPath)
         #########----存储模型节点，单元等列表
         self.saveNodeList = []
         self.saveGeomfList=[]
@@ -341,7 +342,7 @@ class OpenSeesPyX():
     ####################################################################################################################
     def auxiliary_writeModelInformationToDB(self):
         """
-        When call this method all nodes,elements..., that need to be visualized by SAPBridge will be written to the
+        When call this method all nodes,elements..., that need to be visualized by SAPStructure will be written to the
         result database
         """
         nodeDict={}
@@ -351,7 +352,6 @@ class OpenSeesPyX():
                 nodeDict[eachItem[1]].append(eachItem[0])
             else:
                 nodeDict[eachItem[1]].append(eachItem[0])
-
         [self.saveInstance.saveNodes(nodesSaveName=eachKey, nodeList=nodeDict[eachKey]) for eachKey in nodeDict.keys()]
         self.saveNodeList=[]###---empty the list after writing data to database
 
@@ -541,7 +541,7 @@ class OpenSeesPyX():
             else:
                 transTag=argsList[returnValue[0]]
             eleNodes=ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle',eleNodes[0],eleNodes[1],transTag],tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
@@ -549,7 +549,7 @@ class OpenSeesPyX():
         elif eleType in ['Truss','truss','TrussSection','trussSection','corotTruss','CorotTruss','corotTrussSection',
                          'CorotTrussSection']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['twoNodeLink','TwoNodeLink']:
@@ -603,7 +603,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -800,6 +800,16 @@ class OpenSeesPyX():
 
         ################################################################################################################
         elif eleType in ['zeroLength', 'ZeroLength']:
+            dirIndex = argsList.index('-dir')
+            tempValue=[]
+            for eachItem in argsList[(dirIndex+1):]:
+                if isinstance(eachItem, int):
+                    tempValue.append(eachItem)
+                else:
+                    break
+            if eleTag not in self.zeroEleDirDict.keys():
+                self.zeroEleDirDict[eleTag] = tempValue
+            ###################################################
             eleNodes = ops.eleNodes(eleTag)
             localXVector = [1, 0, 0]
             localYVector = [0, 1, 0]
@@ -810,8 +820,8 @@ class OpenSeesPyX():
                 localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
-            self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"] ,tipValue+ "_ele"])
+            self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1]]+localXVector+localYVector,
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
         elif eleType in ['zeroLengthND', 'ZeroLengthND']:
@@ -825,7 +835,7 @@ class OpenSeesPyX():
                 localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -840,28 +850,28 @@ class OpenSeesPyX():
                 localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
         elif eleType in ['CoupledZeroLength', 'coupledZeroLength']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['zeroLengthContact2D', 'ZeroLengthContact2D','zeroLengthContact3D','ZeroLengthContact3D']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['zeroLengthInterface2D', 'ZeroLengthInterface2D']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['zeroLengthImpact3D', 'ZeroLengthImpact3D']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         ################################################################################################################
@@ -872,7 +882,7 @@ class OpenSeesPyX():
             else:
                 transTag = argsList[returnValue[0]]
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle', eleNodes[0], eleNodes[1], transTag],tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
@@ -884,7 +894,7 @@ class OpenSeesPyX():
             else:
                 transTag = argsList[returnValue[0]]
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle', eleNodes[0], eleNodes[1], transTag],
                                           tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
@@ -893,7 +903,7 @@ class OpenSeesPyX():
         elif eleType in ['dispBeamColumn', 'DispBeamColumn']:
             transTag=argsList[4]
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle', eleNodes[0], eleNodes[1], transTag],
                                           tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
@@ -902,7 +912,7 @@ class OpenSeesPyX():
         elif eleType in ['forceBeamColumn', 'ForceBeamColumn']:
             transTag=argsList[4]
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle', eleNodes[0], eleNodes[1], transTag],
                                           tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
@@ -915,7 +925,7 @@ class OpenSeesPyX():
             else:
                 transTag = argsList[returnValue[0]]
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle', eleNodes[0], eleNodes[1], transTag],
                                           tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
@@ -924,7 +934,7 @@ class OpenSeesPyX():
         elif eleType in ['dispBeamColumnInt', 'DispBeamColumnInt']:
             transTag=argsList[6]
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['realEle', eleNodes[0], eleNodes[1], transTag],
                                           tipValue + "_eleLocCordSys"])
             self.eleSetNameList.append(tipValue + "_ele")
@@ -932,37 +942,37 @@ class OpenSeesPyX():
         ################################################################################################################
         elif eleType in ['MVLEM', 'mVLEM']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['SFI_MVLEM', 'sFI_MVLEM']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['beamColumnJoint','BeamColumnJoint']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['ElasticTubularJoint','elasticTubularJoint']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['Joint2D','joint2D']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['Joint2D','joint2D']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['CatenaryCable','catenaryCable']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
 
@@ -1021,7 +1031,7 @@ class OpenSeesPyX():
 
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1076,7 +1086,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1131,7 +1141,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1186,18 +1196,18 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
         elif eleType in ['TFP','tFP']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['TripleFrictionPendulum','tripleFrictionPendulum']:
             eleNodes = ops.eleNodes(eleTag)
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.eleSetNameList.append(tipValue + "_ele")
         ################################################################################################################
         elif eleType in ['multipleShearSpring','MultipleShearSpring']:
@@ -1251,7 +1261,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1306,7 +1316,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1361,7 +1371,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1416,7 +1426,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1471,7 +1481,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1526,7 +1536,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1581,7 +1591,7 @@ class OpenSeesPyX():
                             localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1592,7 +1602,7 @@ class OpenSeesPyX():
             localYVector = [argsList[orientIndex + 3], argsList[orientIndex + 4], argsList[orientIndex + 5]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
-            self.saveEleList.append([[eleTag] + eleNodes,tipValue + "_ele"])
+            self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
             self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
@@ -1813,10 +1823,10 @@ class OpenSeesPyX():
                     eleItemDict={('trussEle_'+responseType+'_'+str(eachEle)):[] for eachEle in eleTags}
                     trussEleResponseDict = {**trussEleResponseDict, **eleItemDict}  ##Merge two dicts
                 elif each[0]=='zeroEle':
-                    responseType, directions,eleTags = each[1], each[2],each[3]
+                    responseType,eleTags = each[1], each[2]
                     eleItemDict = {('zeroEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     zeroEleResponseDict = {**zeroEleResponseDict, **eleItemDict}  ##Merge two dicts
-                    eleDirectDict = {('zeroEle_' + responseType + '_' + str(eachEle)):directions for eachEle in eleTags}
+                    eleDirectDict = {('zeroEle_' + responseType + '_' + str(eachEle)):self.zeroEleDirDict[eachEle] for eachEle in eleTags}
                     zeroEleDirectionDict = {**zeroEleDirectionDict, **eleDirectDict}  ##Merge two dicts
                 elif each[0]=='nonEleSection':
                     responseType,sectNum,eleTags=each[1],each[2],each[3]
@@ -1863,17 +1873,18 @@ class OpenSeesPyX():
                 [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
                   tempValue1 := [0.0],
                   tempValue2 := eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                  tempValue3 := [[round(each, 3) for each in tempValue2]],
-                  tempValue := tempValue1 + tempValue3 + [zeroEleDirectionDict[eachkey]],
+                  tempValue3 := [round(each, 6) for each in tempValue2],
+                  tempValue := [tempValue1 + tempValue3] + [zeroEleDirectionDict[eachkey]],
                   zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)].append(tempValue)] for
                  eachkey in eleKeys]  ##海象操作符
                 [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  saveValueList := zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)],
+                  saveValueList := zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)][0][0],
+                  dirList:=zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)][0][1],
                   self.saveInstance.saveZeroEleResponseTimeHistory(eleSaveName=eachkey,
-                eleHistoryList=saveValueList)] for eachkey in eleKeys]
+                eleHistoryList=[saveValueList],dirList=dirList)] for eachkey in eleKeys]
             if nonEleSectResponsesDict:
                 eleKeys = nonEleSectResponsesDict.keys()
-                digitNumDict = {'sectionForce': 3, 'sectionDeformation': 10}
+                digitNumDict = {'sectionForce': 6, 'sectionDeformation': 10}
                 [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
                   tempValue := [0.0] + [
                       round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},1)"),
@@ -1895,7 +1906,7 @@ class OpenSeesPyX():
                 [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
                   tempValue1 := [0.0],
                   tempValue2 := eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                  tempValue3 := [round(each, 3) for each in tempValue2],
+                  tempValue3 := [round(each, 6) for each in tempValue2],
                   tempValue := tempValue1 + tempValue3,
                   nonZeroEleResponsesDict[eachkey].append(tempValue)] for eachkey in eleKeys]
                 [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
@@ -2217,7 +2228,6 @@ class OpenSeesPyX():
         ######################################################
         #######################################################
         writeInterNum=200 ###---每200时间步将结果写入数据库一次
-        recordList=recordList[0]
         if recordList!=None:
             nodeDict={}
             trussEleResponseDict={}
@@ -2236,10 +2246,10 @@ class OpenSeesPyX():
                     eleItemDict={('trussEle_'+responseType+'_'+str(eachEle)):[] for eachEle in eleTags}
                     trussEleResponseDict = {**trussEleResponseDict, **eleItemDict}  ##Merge two dicts
                 elif each[0]=='zeroEle':
-                    responseType, directions,eleTags = each[1], each[2],each[3]
+                    responseType, eleTags = each[1], each[2]
                     eleItemDict = {('zeroEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     zeroEleResponseDict = {**zeroEleResponseDict, **eleItemDict}  ##Merge two dicts
-                    eleDirectDict = {('zeroEle_' + responseType + '_' + str(eachEle)):directions for eachEle in eleTags}
+                    eleDirectDict = {('zeroEle_' + responseType + '_' + str(eachEle)):self.zeroEleDirDict[eachEle] for eachEle in eleTags}
                     zeroEleDirectionDict = {**zeroEleDirectionDict, **eleDirectDict}  ##Merge two dicts
                 elif each[0]=='nonEleSection':
                     responseType,sectNum,eleTags=each[1],each[2],each[3]
@@ -2317,26 +2327,29 @@ class OpenSeesPyX():
                             for eachkey in eleKeys:
                                 trussEleResponseDict[eachkey] = []
                         [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],tempValue1:=[round(tCurrent,4)],
-                          tempValue2:=[round(eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]"),3)],
+                          tempValue2:=[round(eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]"),6)],
                           tempValue:=tempValue1+tempValue2,
                           trussEleResponseDict['trussEle_'+resType+'_'+str(eleTag)].append(tempValue)] for eachkey in eleKeys]
                     if zeroEleResponseDict:
                         eleKeys = zeroEleResponseDict.keys()
                         if (len(zeroEleResponseDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
                             [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
-                              saveValueList:=zeroEleResponseDict['zeroEle_'+resType+'_'+str(eleTag)],
+                              saveValueListSS:=zeroEleResponseDict['zeroEle_'+resType+'_'+str(eleTag)],
+                              saveValueList:=[each[0] for each in saveValueListSS],
+                              dirValueList:=saveValueListSS[0][1],
                               self.saveInstance.saveZeroEleResponseTimeHistory(eleSaveName=eachkey,
-                              eleHistoryList=saveValueList)] for eachkey in eleKeys]
+                              eleHistoryList=saveValueList,dirList=dirValueList)] for eachkey in eleKeys]
                             for eachkey in eleKeys:
                                 zeroEleResponseDict[eachkey] = []
                         [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],tempValue1:=[round(tCurrent,4)],
                           tempValue2:=eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                          tempValue3:=[[round(each,3) for each in tempValue2]],
-                          tempValue:= tempValue1 + tempValue3+[zeroEleDirectionDict[eachkey]],
+                          tempValue3:=[round(each,6) for each in tempValue2],
+                          tempValue:= [tempValue1 + tempValue3]+[zeroEleDirectionDict[eachkey]],
                           zeroEleResponseDict['zeroEle_'+resType+'_'+str(eleTag)].append(tempValue)] for eachkey in eleKeys]##海象操作符
+                        # print(zeroEleResponseDict)
                     if nonEleSectResponsesDict:
                         eleKeys = nonEleSectResponsesDict.keys()
-                        digitNumDict = {'sectionForce':3,'sectionDeformation':10}
+                        digitNumDict = {'sectionForce':6,'sectionDeformation':10}
                         if (len(nonEleSectResponsesDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
                             [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
                               saveValueList:=nonEleSectResponsesDict['nonEle_'+resType+'_'+str(eleTag)],

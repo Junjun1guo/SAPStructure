@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="cableStayedBrideModel.db" uuid="71959ae2-42d2-4a09-a376-8c86ab62c854">
+    <data-source source="LOCAL" name="ModelInfoDB.db" uuid="ea1c8227-f535-449d-a0a8-780215035da7">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/example-1-cableStayedBridge/cableStayedBrideModel.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$USER_HOME$/Desktop/ModelInfoDB.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

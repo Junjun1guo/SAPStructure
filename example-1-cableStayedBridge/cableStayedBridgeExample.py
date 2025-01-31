@@ -61,7 +61,6 @@ for each in cableNodes:
     nodeMassValue = float(each[4])
     ###---为了可视化采用opsX,参数跟ops中完全一致
     opsX.node(nodeTageValue, xCoordValue, yCoordValue, zCoordValue, '-mass', nodeMassValue, nodeMassValue,nodeMassValue, 0.0, 0.0, 0.0)
-    opsX.auxiliary_writeModelInformationToDB()  ###---将模型信息写入数据库，以便在SAPBridge中显示模型
 ########################################################################################################################
 ##########################################---建立拉索材料---##############################################################
 cableMaterial = np.loadtxt('modelInformation/newCableMat.txt')
@@ -74,8 +73,8 @@ for each in cableMaterial:
     epsyNValue = 0.0
     epsyPValue = cableYieldStress / float(cableEValue) + eps0Value
     ops.uniaxialMaterial('ElasticPP', cableMatTag, cableEValue, epsyPValue, epsyNValue, eps0Value)
-########################################################################################################################
-##########################################---建立拉索单元---##############################################################
+# ########################################################################################################################
+# ##########################################---建立拉索单元---##############################################################
 cableEle = np.loadtxt('modelInformation/newCableEle.txt')
 for each in cableEle:
     EleTag = int(each[0])
@@ -84,8 +83,8 @@ for each in cableEle:
     A = float(each[3])
     MatTag = int(each[4])
     opsX.element('Truss', EleTag, NodeI, NodeJ, A, MatTag)
-########################################################################################################################
-##########################################---建立主梁节点---##############################################################
+# ########################################################################################################################
+# ##########################################---建立主梁节点---##############################################################
 girderNode = np.loadtxt('modelInformation/GirderNode.txt')
 for each in girderNode:
     nodeTageValue = int(each[0])
@@ -95,8 +94,8 @@ for each in girderNode:
     nodeMassValue = float(each[4])
     ###---为了可视化采用opsX,参数跟ops中完全一致
     opsX.node(nodeTageValue, xCoordValue, yCoordValue, zCoordValue, '-mass', nodeMassValue, nodeMassValue,nodeMassValue, 0.0, 0.0, 0.0)
-########################################################################################################################
-##########################################---建立主梁局部坐标转换---########################################################
+# ########################################################################################################################
+# ##########################################---建立主梁局部坐标转换---########################################################
 girderTransf = np.loadtxt('modelInformation/newGirderTransf.txt')
 for each in girderTransf:
     TransfTag = int(each[0])
@@ -105,8 +104,8 @@ for each in girderTransf:
     localZZCoord = float(each[3])
     ###---为了显示单元局部坐标轴,采用opsX,局部1,2,3采用红、绿、蓝表示
     opsX.geomTransf('PDelta', TransfTag, localZXCoord, localZYCoord, localZZCoord)
-########################################################################################################################
-##########################################---建立主梁单元---##############################################################
+# ########################################################################################################################
+# ##########################################---建立主梁单元---##############################################################
 girderEle = np.loadtxt('modelInformation/GirderEle.txt')
 for each in girderEle:
     EleTag = int(each[0])
@@ -120,8 +119,8 @@ for each in girderEle:
     Iz = float(each[8])
     Transf = int(each[9])
     opsX.element('elasticBeamColumn', EleTag, NodeI, NodeJ, A, E, G, J, Iy, Iz, Transf)
-########################################################################################################################
-##########################################---建立墩柱节点---##############################################################
+# ########################################################################################################################
+# ##########################################---建立墩柱节点---##############################################################
 pierNode = np.loadtxt('modelInformation/newPierNodes.txt')
 for each in pierNode:
     nodeTageValue = int(each[0])
@@ -131,8 +130,8 @@ for each in pierNode:
     nodeMassValue = float(each[4])
     ###---为了可视化采用opsX,参数跟ops中完全一致
     opsX.node(nodeTageValue, xCoordValue, yCoordValue, zCoordValue, '-mass', nodeMassValue, nodeMassValue,nodeMassValue, 0.0, 0.0, 0.0)
-########################################################################################################################
-##########################################---建立墩柱局部坐标转换---########################################################
+# ########################################################################################################################
+# ##########################################---建立墩柱局部坐标转换---########################################################
 pierTransf = np.loadtxt('modelInformation/newPierTransfRotate-1.txt')
 for each in pierTransf:
     TransfTag = int(each[0])
@@ -141,8 +140,8 @@ for each in pierTransf:
     localZZCoord = float(each[3])
     ###---为了显示单元局部坐标轴,采用opsX,局部1,2,3采用红、绿、蓝表示
     opsX.geomTransf('PDelta', TransfTag, localZXCoord, localZYCoord, localZZCoord)
-########################################################################################################################
-##########################################---建立弹性墩柱单元---###########################################################
+# ########################################################################################################################
+# ##########################################---建立弹性墩柱单元---###########################################################
 elasticPylonEle = np.loadtxt('modelInformation/elasticPylonEle.txt')
 for each in elasticPylonEle:
     EleTag = int(each[0])
@@ -156,8 +155,8 @@ for each in elasticPylonEle:
     Iz = float(each[8])
     Transf = int(each[9])
     opsX.element('elasticBeamColumn', EleTag, NodeI, NodeJ, A, E, G, J, Iy, Iz, Transf)
-########################################################################################################################
-##########################################---建立各种单轴材料---###########################################################
+# ########################################################################################################################
+# ##########################################---建立各种单轴材料---###########################################################
 HRB235Number = opsX.auxiliary_materialReNumber('HRB235')  ###---用于返回材料编号
 ops.uniaxialMaterial('Steel01',HRB235Number, 235.e3, 2.1e8, 0.005)
 HRB335Number = opsX.auxiliary_materialReNumber('HRB335')
@@ -264,8 +263,8 @@ for i1 in range(51068, 51078):
     ops.section('Fiber', int(i1), '-GJ', 1.0e10)
     [ops.fiber(eachItem[0], eachItem[1], eachItem[2], pylonUpperMatList[i1]) for i1 in range(len(pylonUpperList))
      for eachItem in pylonUpperList[i1]]
-########################################################################################################################
-##########################################---建立非线性单元---#############################################################
+# ########################################################################################################################
+# ##########################################---建立非线性单元---#############################################################
 nonLinearPylonEle = np.loadtxt('modelInformation/nonLinerPylonEle.txt')
 integrationPoint=5
 for each in nonLinearPylonEle:
@@ -275,8 +274,8 @@ for each in nonLinearPylonEle:
     EleGeomTransf = int(each[3])
     EleSection = int(each[4])
     opsX.element('nonlinearBeamColumn', EleTag, EleNodeI, EleNodeJ, integrationPoint,EleSection, EleGeomTransf)
-########################################################################################################################
-##########################################---建立横梁单元局部坐标转换---#####################################################
+# ########################################################################################################################
+# ##########################################---建立横梁单元局部坐标转换---#####################################################
 crossBeamTransf = np.loadtxt('modelInformation/newCrossBeamTransf.txt')
 for each in crossBeamTransf:
     TransfTag = int(each[0])
@@ -285,8 +284,9 @@ for each in crossBeamTransf:
     localZZCoord = float(each[3])
     ###---为了显示单元局部坐标轴,采用opsX,局部1,2,3采用红、绿、蓝表示
     opsX.geomTransf('PDelta', TransfTag, localZXCoord, localZYCoord, localZZCoord)
-########################################################################################################################
-##########################################---建立横梁单元---##############################################################
+
+# ########################################################################################################################
+# ##########################################---建立横梁单元---##############################################################
 crossBeamEle = np.loadtxt('modelInformation/crossBeamEle.txt')
 for each in crossBeamEle:
     EleTag = int(each[0])
@@ -300,8 +300,8 @@ for each in crossBeamEle:
     Iz = float(each[8])
     Transf = int(each[9])
     opsX.element('elasticBeamColumn', EleTag, NodeI, NodeJ, A, E, G, J, Iy, Iz, Transf)
-########################################################################################################################
-##########################################---建立其他节点---##############################################################
+# ########################################################################################################################
+# ##########################################---建立其他节点---##############################################################
 otherNodes = np.loadtxt('modelInformation/newOtherNodes.txt')
 for each in otherNodes:
     nodeTageValue = int(each[0])
@@ -311,13 +311,13 @@ for each in otherNodes:
     nodeMassValue = float(each[4])
     ###---为了可视化采用opsX,参数跟ops中完全一致
     opsX.node(nodeTageValue, xCoordValue, yCoordValue, zCoordValue, '-mass', nodeMassValue, nodeMassValue,nodeMassValue, 0.0, 0.0, 0.0)
-########################################################################################################################
-##########################################---建立节点固接---##############################################################
+# ########################################################################################################################
+# ##########################################---建立节点固接---##############################################################
 fixList = [19000, 29000, 39000, 49000, 59000, 69000, 79000, 89000, 99000]
 for each in fixList:
     ops.fix(int(each), 1, 1, 1, 1, 1, 1)
-########################################################################################################################
-##########################################---建立大刚度单元模拟固接---######################################################
+# ########################################################################################################################
+# ##########################################---建立大刚度单元模拟固接---######################################################
 equlDOF = np.loadtxt('modelInformation/equalDOF.txt')
 for each in equlDOF:
     EleTag = int(each[0])
@@ -331,8 +331,8 @@ for each in equlDOF:
     Iz = float(each[8])
     Transf = int(each[9])
     opsX.element('elasticBeamColumn', EleTag, NodeI, NodeJ, A, E, G, J, Iy, Iz, Transf)
-########################################################################################################################
-##########################################---建立支座单元---##############################################################
+# ########################################################################################################################
+# ##########################################---建立支座单元---##############################################################
 uniaxialMatExpre=[('ENT', 9000, 1.0E7),('Elastic', 8000, 1.0E8),('ElasticPP', 9001, 2.5E5, 0.002),
                   ('ElasticPP', 9002, 4.5E5, 0.002),('ElasticPP', 9003, 5.0E5, 0.002),('ElasticPP', 9004, 2.5E5, 0.002),
                   ('ElasticPP', 9005, 2.5E5, 0.002),('ElasticPP', 9006, 5.0E5, 0.002),('ElasticPP', 9007, 4.5E5, 0.002),
@@ -354,7 +354,7 @@ for i1 in range(18):
     opsX.element('zeroLength', bearingEleNode[i1][0],bearingEleNode[i1][1],bearingEleNode[i1][2], '-mat',
                 materialTag[i1][0],materialTag[i1][1],materialTag[i1][2], '-dir', 1, 2, 3, '-orient', 0, 0, 1,
                             brTraf[beIn[i1]][0], brTraf[beIn[i1]][1], brTraf[beIn[i1]][2])
-##################---建立弹簧单元---#########################
+# ##################---建立弹簧单元---#########################
 springStiffnessName = [["U1_1", "U2_1", "U3_1", "R1_1", "R2_1", "R3_1"],
                        ["U1_2", "U2_2", "U3_2", "R1_2", "R2_2", "R3_2"],
                        ["U1_3", "U2_3", "U3_3", "R1_3", "R2_3", "R3_3"],
@@ -393,12 +393,13 @@ for i1 in range(9):
     numbers5 = opsX.auxiliary_materialReNumber(springStiffnessName[i1][5])
     ops.uniaxialMaterial('Elastic', numbers5, stiffVal[i1][5])
     opsX.element('zeroLength', springEleNode[i1][0],springEleNode[i1][1],springEleNode[i1][2], '-mat',
-                numbers0,numbers1,numbers2,numbers3,numbers4,numbers5, '-dir', 1, 2,3, 4,5, 6,'-orient', 0, 0, 1,
-                brTraf[i1][0], brTraf[i1][1], brTraf[i1][2]),
-########################################################################################################################
-# opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
-########################################################################################################################
-##########################################---施加重力荷载---##############################################################
+                numbers0,numbers1,numbers2,numbers3,numbers4,numbers5, '-dir', 1, 2,3, 4,5,6,'-orient', 0, 0, 1,
+                brTraf[i1][0], brTraf[i1][1], brTraf[i1][2])
+# opsX.auxiliary_writeModelInformationToDB()  ###---将模型信息写入数据库，以便在SAPBridge中显示模型
+# ########################################################################################################################
+# # opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
+# ########################################################################################################################
+# ##########################################---施加重力荷载---##############################################################
 nodesTags=ops.getNodeTags()
 nodesMass=[ops.nodeMass(each)[0] for each in nodesTags]
 nodeList=[[node,mass] for node,mass in zip(nodesTags, nodesMass)]
@@ -406,8 +407,8 @@ ops.timeSeries('Linear', 1)
 ops.pattern('Plain', 1, 1)
 for each in nodeList:
     ops.load(int(each[0]), 0.0, 0.0, -each[1] * 9.81, 0.0, 0.0, 0.0)
-########################################################################################################################
-##########################################---记录响应---#################################################################
+# ########################################################################################################################
+# ##########################################---记录响应---#################################################################
 #######响应记录列表
 ###########for node, ('node', 'disp', [1, 2, 3])-(keyWord,responseType,nodeTagsList)
 ###########('node', 'disp', [1, 2, 3]), ('node', 'vel', [1, 2, 3]),('node','accel',[1,2,3]),
@@ -424,10 +425,14 @@ nodeRespList = [41129, 51125, 223]
 pylonEleNumList = [41001, 41018, 41019, 41081, 41082, 51001, 51014, 51015, 51077, 51078, 11001, 11016, 21001, 21020,
                    31001, 31016, 61001, 61016, 71001, 71020, 81001, 81020, 91001, 91020]
 cableEleList = [each for each in range(45001, 45039)] + [each for each in range(46001, 46039)]
-BearingList = [2301, 2101, 3101, 4101, 5101, 6101, 7101, 8101, 9101]
+BearingList = [2301, 2101, 3101, 4101, 5101]
+BearingList1=[6101, 7101, 8101, 9101]
+springEleList=[19000,29000]
 recordList = [('node', 'disp', girderNodeList), ('node', 'disp', nodeRespList), ('node', 'accel', nodeRespList),
-              ('trussEle', 'axialForce', cableEleList), ('zeroEle', 'deformation', [1, 2, 3], BearingList),
-              ('zeroEle', 'localForce', [1, 2, 3], BearingList),
+              ('trussEle', 'axialForce', cableEleList), ('zeroEle', 'deformation', BearingList),
+              ('zeroEle', 'deformation', BearingList1),
+              ('zeroEle', 'localForce', BearingList),
+              ('zeroEle', 'localForce', springEleList),
               ('nonEleSection', 'sectionForce', 1, pylonEleNumList),
               ('nonEleSection', 'sectionDeformation', 1, pylonEleNumList),
               ('nonZeroEle', 'localForce', [41001, 41018, 41019])]
@@ -436,28 +441,24 @@ start=time()
 opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 end=time()
 print("写入数据库时间为:",end-start)
-########################################################################################################################
-##########################################---重力分析---##################################################################
-opsX.integration_analysisGravity(totalStep=1,recordList=None) ###---采用集成式方法进行自重分析(包装了自重分析相关命令)
-########################################################################################################################
-##########################################---模态分析---##################################################################
+# ########################################################################################################################
+# ##########################################---重力分析---##################################################################
+opsX.integration_analysisGravity(totalStep=1,recordList=recordList) ###---采用集成式方法进行自重分析(包装了自重分析相关命令)
+opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
+# ########################################################################################################################
+# ##########################################---模态分析---##################################################################
 opsX.integration_analysisModal(numModes=50) ###---采用集成式方法进行自重分析(包装了模态分析相关命令)
-####---opsX.integration_analysisModalProperties(numEigen=50,pflag=1,outname=None) ###---详细动力特性分析
-########################################################################################################################
-##########################################---时程分析---##################################################################
+# ####---opsX.integration_analysisModalProperties(numEigen=50,pflag=1,outname=None) ###---详细动力特性分析
+# ########################################################################################################################
+# ##########################################---时程分析---##################################################################
 waveLength =7997
 dt =0.005
 waveNumber=1 ###---地震动编号，用于屏幕输出
 acc_X = 'inputGroundMotion/horizontal/1.txt'
 acc_Z = 'inputGroundMotion/vertical/1.txt'
-recordList = [('node', 'disp', girderNodeList),('node', 'disp', nodeRespList),('node', 'accel', nodeRespList),
-              ('node', 'vel', nodeRespList),('trussEle','axialForce',cableEleList),('trussEle','axialDeform',cableEleList),
-              ('zeroEle','deformation',[1,2,3],BearingList),('zeroEle','localForce',[1,2,3],BearingList),
-              ('nonEleSection','sectionForce',1,pylonEleNumList),('nonEleSection','sectionDeformation',1,pylonEleNumList),
-              ('nonZeroEle','localForce',[41001, 41025])],
 # opsX.integration_earthquakeExcite(RayleighDamping=['mode-1',dampingRatio,Tstart,Tend],waveLenth=length,dt=dt,
 # 								  dirList=[1],motionList=[pathName],recordList=None)
 #####----RayleighDamping=['mode-2',alphaM,betaK,betaKinit,betaKcommit],RayleighDamping=['mode-1',dampingRatio,Tstart,Tend]
 opsX.integration_earthquakeExcite(['mode-1',0.03, 13.385, 0.206], waveLenth=waveLength,
                                      dt=dt, dirList=[1, 3], motionList=[acc_X, acc_Z],recordList=recordList,waveNumber=1)
-########################################################################################################################
+# ########################################################################################################################
