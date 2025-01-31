@@ -11,8 +11,6 @@ ______
 - [Tutorial-4:2D soil profile meshing  with AutoCAD dxf file](#Tutorial-4)
 - [Tutorial-5:Near fault ground motion simulation](#Tutorial-5)
 ______
-### Notes: compatible modules: records==0.5.3, sQLAlchemy==1.3.20    
-
 
 ______
 ## Tutorials-1      
