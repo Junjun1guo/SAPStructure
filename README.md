@@ -18,7 +18,7 @@ ______
 1. Download the zip file
 2. Run the example model (eg. exmple 1)
 3. Download SAPStructure from (https://fbs.sh/JunjunGuo/SAPStructure/SAPStructureSetup.exe)
-4. When encounter error, just close the window, and reopen it as administrator.
+4. When encounter error, just close the window, and reopen it.
 5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
 6. Click loadResultDB button, and load the result database 
 7. Then display the model and conduct post process.     
