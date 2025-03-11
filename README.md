@@ -1,4 +1,4 @@
-# SAPStructure (Version 0.2.0)
+# SAPStructure (Version 0.3.0)
 Seismic analysis platform for structures   
 ##########################################################################    
 Author: Junjun Guo([HomePage](https://github.com/Junjun1guo))    
@@ -11,15 +11,13 @@ ______
 - [Tutorial-4:2D soil profile meshing  with AutoCAD dxf file](#Tutorial-4)
 - [Tutorial-5:Near fault ground motion simulation](#Tutorial-5)
 ______
-### Notes: compatible modules: records==0.5.3, sQLAlchemy==1.3.20    
-
 
 ______
 ## Tutorials-1      
 ### Install SAPStructure and view OpenSeesPy model
 1. Download the zip file
 2. Run the example model (eg. exmple 1)
-3. Download SAPStructure from (https://www.yunpan.com/surl_yGNgf2BXaD9 （code：b00f）) or (https://drive.google.com/file/d/1qRovfA5kCcRkKkifJXYBlciovm06GX9c/view?usp=drive_link)
+3. Download SAPStructure from (https://fbs.sh/JunjunGuo/SAPStructure/SAPStructureSetup.exe)
 4. When encounter error, just close the window, and reopen it.
 5. Select SAPStructure and right click the mouse, then click the properties and choose running the program as an administrator.
 6. Click loadResultDB button, and load the result database 
