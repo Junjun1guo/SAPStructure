@@ -413,6 +413,7 @@ class OpenSeesPyX():
         tipValue = 'node_node'
         self.saveNodeList.append([[nodeTagValue]+coords,tipValue])
         self.nodeSetNameList.append(tipValue)
+        # print("nodeNameList=",self.nodeSetNameList)
 
 
     def geomTransf(self,*args):
@@ -1641,7 +1642,7 @@ class OpenSeesPyX():
             pass
         else:
             self.eleSetNameList.append(tipValue + "_ele")
-            self.saveEleList.append([[0, rNode, cNode],tipValue + "_ele"])
+            self.saveEleList.append([[0, rNode, cNode]+["1D"],tipValue + "_ele"])
     ####################################################################################################################
     def section(self,*args):
         """
