@@ -1,89 +1,96 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import math
-from .responseSpectMain import SaSvSd
-############################################################
+from .responseSpectraCalculate import SaSvSd
+import time
+########################################################################################################################
+#  Author: Junjun Guo
+#  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
+#    Date: 27/08/2025
+#  Environemet: Successfully excucted in python 3.13
+########################################################################################################################
 class IMs():
 	"""
-	地震动强度指标计算
+	A class for ground motion intensity measures calculation.
 	"""
-	def __init__(self,acc,t):
+	def __init__(self,acc,dt):
 		"""
-		类的初始化
-		:param acc: 加速度时程（g)
-		:param t:采样间隔（s)
+		acc(g): acceleration time history
+		dt(s): time interval
 		"""
 		self.acc=acc
-		self.t=t
+		self.t=dt
 		self.num=len(self.acc)
-	###############################
+	####################################################################################################################
 	def PGA(self):
 		"""
-		:return: 地震动峰值加速度(g)
+		return-PGA(g): peak ground acceleration (PGA)
 		"""
 		pga=np.fabs(self.acc).max()
 		return pga
-	###############################
+	####################################################################################################################
 	def AcctoVelocity (self):
 		"""
-		:return: 加速度时程转为速度时程(cm/s)
+		return-vel(cm/s): convert acceleration to velocity
 		"""
 		vel=[0]
 		acc=self.acc
-		for i in range(self.num-1):
-			velocity=(acc[i]+acc[i+1])*self.t/2*981+vel[-1]
-			vel.append(velocity)
+		# for i in range(self.num-1):
+		# 	velocity=(acc[i]+acc[i+1])*self.t/2*981+vel[-1]
+		# 	vel.append(velocity)
+		[[velocity:=(acc[i]+acc[i+1])*self.t/2*981+vel[-1],vel.append(velocity)] for i in range(self.num-1)]
 		return vel
-	###############################
+	####################################################################################################################
 	def PGV (self):
 		"""
-		:return:地震动峰值速度(cm/s)
+		return-PGV(cm/s): peack ground velocity (PGV)
 		"""
 		veloc=self.AcctoVelocity()
 		pgv=np.fabs(veloc).max()
 		return pgv
-	###############################
+	####################################################################################################################
 	def AcctoDisp(self):
 		"""
-		:return: 加速度时程转为位移时程(cm)
+		return-disp(cm): convert acceleration time history to displacement
 		"""
 		disp = [0]
 		veld = self.veloc = self.AcctoVelocity()
-		for i in range(self.num - 1):
-			displacement = (veld[i] + veld[i + 1]) * self.t / 2 + disp[-1]
-			disp.append(displacement)
+		# for i in range(self.num - 1):
+		# 	displacement = (veld[i] + veld[i + 1]) * self.t / 2 + disp[-1]
+		# 	disp.append(displacement)
+		[[displacement:= (veld[i] + veld[i + 1]) * self.t / 2 + disp[-1],disp.append(displacement)] for i in range(self.num - 1)]
 		return disp
-	###############################
+	####################################################################################################################
 	def PGD(self):
 		"""
-		:return: 地震动峰值位移（cm)
+		return-PGD(cm): Peak ground displacement
 		"""
 		dispc = self.AcctoDisp()
 		pgd = np.fabs(dispc).max()
 		return pgd
-	###############################
+	####################################################################################################################
 	def VmaxDivAmax(self):
 		"""
-		:return:峰值速度与峰值加速度比值(s)
+		return-vmax/amax(s):ratio between PGV and PGA
 		"""
 		vmax = self.PGV()
 		amax = self.PGA() * 981
 		ratio = vmax / amax
 		return ratio
-	###############################
+	####################################################################################################################
 	def aRMS(self):
 		"""
-		:return: 加速度均方根(g)
+		return-arms(g): root mean square acceleration
 		"""
 		a2 = np.array(self.acc ** 2)
 		ttol = self.num * self.t
 		atol = sum(a2) * self.t
 		arms = (atol / ttol) ** 0.5
 		return arms
-	###############################
+	####################################################################################################################
 	def vRMS(self):
 		"""
-		:return:速度均方根(cm/s)
+		return-vrms(cm/s):root mean square velocity
 		"""
 		vel = np.array(self.AcctoVelocity())
 		vel2 = vel ** 2
@@ -91,10 +98,10 @@ class IMs():
 		vtol = sum(vel2) * self.t
 		vrms = (vtol / ttol) ** 0.5
 		return vrms
-	###############################
+	####################################################################################################################
 	def dRMS(self):
 		"""
-		:return: 位移均方根(cm)
+		return-drms(cm): root mean square displacement
 		"""
 		disp = np.array(self.AcctoDisp())
 		disp2 = disp ** 2
@@ -102,100 +109,110 @@ class IMs():
 		dtol = sum(disp2) * self.t
 		drms = (dtol / ttol) ** 0.5
 		return drms
-	###############################
+	####################################################################################################################
 	def AI(self):
 		"""
-		:return:Arias轻度（m/s)
+		return-AI(m/s): Arias intensity measure
 		"""
 		a2 = self.acc * 9.81
 		a3 = np.array(a2)
 		a3tol = sum(a3 ** 2) * self.t
 		ai = a3tol * math.pi / (2 * 9.81)
 		return ai
-	###############################
+	####################################################################################################################
 	def Ic(self):
 		"""
-		:return:特征强度(g3/2*s1/2)
+		return-Ic(g3/2*s1/2):Characteristic intensity
 		"""
 		ttol = self.num * self.t
 		Ic = (self.aRMS()) ** (1.5) * (ttol) ** 0.5
 		return Ic
-	###############################
+	####################################################################################################################
 	def SED(self):
 		"""
-		:return: 比能密度(cm2/s)
+		return-sed(cm2/s): Specific energy density
 		"""
 		vel = self.AcctoVelocity()
 		velarr = np.array(vel)
 		sed = sum(velarr ** 2) * self.t
 		return sed
-	###############################
+	####################################################################################################################
 	def CAV(self):
 		"""
-		:return:累计绝对速度（cm/s)
+		return-cav(cm/s):Cumulative absolute velocity
 		"""
 		accarr = np.array(self.acc)
 		accabs = np.fabs(accarr) * 981
 		cav = sum(accabs) * self.t
 		return cav
-	###############################
+	####################################################################################################################
 	def DisptoVelocity(self, displacement, t):
 		"""
-		将位移时程（cm)转为速度时程(cm/s)
-		:param displacement: 位移时程(cm)
-		:param t: 采样间隔(s)
-		:return: 速度时程(cm/s)
+		Convert displacement(cm) to velocity(cm/s)
+		--------------------------------------------------
+		displacement(cm): displacement time history
+		t(s): time interval
+		return-vel(cm/s): velocity time history
 		"""
 		n = len(displacement)
 		vel = [0]
 		disp = displacement
-		for i in range(n - 1):
-			vell = 2 * (disp[i + 1] - disp[i]) / t - vel[-1]
-			vel.append(vell)
+		# for i in range(n - 1):
+		# 	vell = 2 * (disp[i + 1] - disp[i]) / t - vel[-1]
+		# 	vel.append(vell)
+		[[vell:= 2 * (disp[i + 1] - disp[i]) / t - vel[-1],vel.append(vell)] for i in range(n - 1)]
 		return vel
-	###############################
+	####################################################################################################################
 	def VeltoAccele (self,vel,t):
 		"""
-		速度时程(cm/s)转换为加速度时程(g)
-		:param vel: 速度时程（cm/s)
-		:param t: 采样间隔(s)
-		:return: 加速度时程(g)
+		Convert velocity(cm/s) to acceleration(g)
+		----------------------------------------------------
+		vel(cm/s): velocity time history
+		t(s): time interval
+		return-acc(g): acceleration time history
 		"""
 		n = len(vel)
 		acc = [0]
-		for i in range(n - 1):
-			accel = (vel[i + 1] - vel[i]) / (981 * float(dt))
-			acc.append(accel)
+		# for i in range(n - 1):
+		# 	accel = (vel[i + 1] - vel[i]) / (981 * float(dt))
+		# 	acc.append(accel)
+		[[accel:= (vel[i + 1] - vel[i]) / (981 * float(dt)),acc.append(accel)] for i in range(n - 1)]
 		return acc
-	###############################
+	####################################################################################################################
 	def ASI(self):
 		"""
-		:return:加速度谱强度(g*s)
+		return-ASI(g*s): Acceleration spectral intensity
 		"""
 		T=np.arange(0.1,0.52,0.02)
-		Tr,Sar,Svr,Sdr= self.calResponseSpe(1, T, 0.05)
+		# startTime=time.time()
+		Tr,Sar,Svr,Sdr= self.calResponseSpe(T, 0.05)
+		# endTime=time.time()
+		# print("run time=",endTime-startTime)
 		asi = sum(Sar) * 0.02
 		return asi
-	###############################
-	def calResponseSpe (self,m,T,beta):
+	####################################################################################################################
+	def calResponseSpe (self,T,beta):
 		"""
-		:param m:单自由度质量，默认为11
-		:param T:周期列表(s)
-		:param beta:阻尼比
-		:return:周期点，绝对加速度（g)，速度(cm/s)及位移峰值(cm)
+		Response spectral calculation
+		------------------------------------------------
+		SaSvSd(acc:list,dt:float,T:list,beta:float)
+		T(s):Period list
+		beta:Damping ratio
+		return:Period Value(s)，absolute acceleratio spectrum（g)，relative velocity spectrum (cm/s)
+		and relative displacement spectrum (cm)
 		"""
-		sa,sv,sd = responseSpectMain.SaSvSd(self.acc,self.t, T, beta)
+		sa,sv,sd = SaSvSd(self.acc,self.t, T, beta)
 		return T,sa,sv,sd
-	###############################
+	####################################################################################################################
 	def VSI(self):
 		"""
-		:return:速度谱强度（cm)
+		return-VSI(cm):Velocity spectral intensity
 		"""
 		T = np.arange(0.1, 2.52, 0.02)
-		Tr, Sar, Svr, Sdr = self.calResponseSpe(1, T, 0.05)
+		Tr, Sar, Svr, Sdr = self.calResponseSpe(T, 0.05)
 		vsi = sum(Svr) * 0.02
 		return vsi
-	###############################
+	####################################################################################################################
 	def __SMR (self,response):
 		#this parameter gives the sustained maximum acceleration/velocity during three cycles,
 		#and is defined as the third highest absolute value of acceleration/velocity in the time-history
@@ -208,28 +225,31 @@ class IMs():
 		aMiddle=a[20:-21]
 		b=[]
 		c=[]
-		for i in range(len(aMiddle)-1):
-			if aMiddle[i]*aMiddle[i+1]<0:
-				b.append(i)
-		for i in np.arange(0,len(b)-1,1):
-			c.append(np.fabs(aMiddle[b[i]:b[i+1]]).max())
+		# for i in range(len(aMiddle)-1):
+		# 	if aMiddle[i]*aMiddle[i+1]<0:
+		# 		b.append(i)
+		[b.append(i) for i in range(len(aMiddle)-1) if aMiddle[i]*aMiddle[i+1]<0 ]
+
+		# for i in np.arange(0,len(b)-1,1):
+		# 	c.append(np.fabs(aMiddle[b[i]:b[i+1]]).max())
+		[c.append(np.fabs(aMiddle[b[i]:b[i+1]]).max()) for i in np.arange(0,len(b)-1,1)]
 		c.sort()
 		return c[-3]
-	###############################
+	####################################################################################################################
 	def SMA(self):
 		"""
-		:return: 持续最大加速度(g),加速度时程绝对值第三高值
+		return-SMA(g): 持续最大加速度(g),加速度时程绝对值第三高值
 		"""
 		sma = self.__SMR(self.acc)
 		return sma
-	###############################
+	####################################################################################################################
 	def SMV (self):
 		"""
-		:return: 持续最大速度(cm/s)，速度时程绝对值第三高值
+		:return: Sustained Maximum Acceleration, Third Highest Absolute Value in Acceleration Time History
 		"""
 		smv=self.__SMR(self.AcctoVelocity ())
 		return smv
-	###############################
+	####################################################################################################################
 	def A95 (self):
 		#The acceleration level below which 95% of the total Arias intensity is contained.
 		#In other words, if the entire accelerogram yields a value of Ia equal to 100, the
@@ -241,14 +261,16 @@ class IMs():
 		t=self.t
 		acc.sort()
 		acclist=[0]
-		for i in range(len(acc)):
-			acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
-		for i in range(len(acclist)):
-			if acclist[i]>=threshold:
-				a95=acc[i-1]/9.81
-				break
+		# for i in range(len(acc)):
+		# 	acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
+		[acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1]) for i in range(len(acc))]
+		# for i in range(len(acclist)):
+		# 	if acclist[i]>=threshold:
+		# 		a95=acc[i-1]/9.81
+		# 		break
+		a95 = next((acc[i - 1] / 9.81 for i in range(len(acclist)) if acclist[i] >= threshold), None)
 		return a95
-	###############################
+	####################################################################################################################
 	def Ia (self):
 		#Compound acc.-related IM  (g.s**1/3)
 		#Riddell R, Garcia J (2001) Hysteretic energy spectrum and damage control. Earthq Eng Struct Dyn30(12):1791–1816
@@ -261,21 +283,28 @@ class IMs():
 		acclist=[0]
 		t1=[]
 		t2=[]
-		for i in range(len(acc)):
-			acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
-		for i1 in range(len(acclist)):
-			if acclist[i1]>=thresholdt1:
-				t1.append(i1*t)
-				break
-		for i2 in range(len(acclist)):
-			if acclist[i2]>=thresholdt2:
-				t2.append(i2*t)
-				break
+		# for i in range(len(acc)):
+		# 	acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
+		[acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1]) for i in range(len(acc))]
+		# for i1 in range(len(acclist)):
+		# 	if acclist[i1]>=thresholdt1:
+		# 		t1.append(i1*t)
+		# 		break
+		t1_value=next((i1*t for i1 in range(len(acclist)) if acclist[i1]>=thresholdt1 ), None)
+		if t1_value is not None:
+			t1.append(t1_value)
+		# for i2 in range(len(acclist)):
+		# 	if acclist[i2]>=thresholdt2:
+		# 		t2.append(i2*t)
+		# 		break
+		t2_value = next((i2 * t for i2 in range(len(acclist)) if acclist[i2] >= thresholdt2), None)
+		if t2_value is not None:
+			t2.append(t2_value)
 		td=t2[0]-t1[0]
 		pga=self.PGA()
 		Ia=pga*(td**(1.0/3.0))
 		return Ia
-	###############################
+	####################################################################################################################
 	def FI (self):
 		#Fajfar intensity  (cm/s**0.75)
 		#Fajfar P, Vidic T, Fischinger M (1990) A measure of earthquake motion capacity to damage medium-period
@@ -289,21 +318,28 @@ class IMs():
 		acclist=[0]
 		t1=[]
 		t2=[]
-		for i in range(len(acc)):
-			acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
-		for i1 in range(len(acclist)):
-			if acclist[i1]>=thresholdt1:
-				t1.append(i1*t)
-				break
-		for i2 in range(len(acclist)):
-			if acclist[i2]>=thresholdt2:
-				t2.append(i2*t)
-				break
+		# for i in range(len(acc)):
+		# 	acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
+		[acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1]) for i in range(len(acc))]
+		# for i1 in range(len(acclist)):
+		# 	if acclist[i1]>=thresholdt1:
+		# 		t1.append(i1*t)
+		# 		break
+		t1_value = next((i1 * t for i1 in range(len(acclist)) if acclist[i1] >= thresholdt1), None)
+		if t1_value is not None:
+			t1.append(t1_value)
+		# for i2 in range(len(acclist)):
+		# 	if acclist[i2]>=thresholdt2:
+		# 		t2.append(i2*t)
+		# 		break
+		t2_value = next((i2 * t for i2 in range(len(acclist)) if acclist[i2] >= thresholdt2), None)
+		if t2_value is not None:
+			t2.append(t2_value)
 		td=t2[0]-t1[0]
 		pgv=self.PGV()
 		fi=pgv*(td**(0.25))
 		return fi
-	###############################
+	####################################################################################################################
 	def Iv (self):
 		#Compound vel.-related IM (cm**2/3)/s**1/3
 		#Riddell R, Garcia J (2001) Hysteretic energy spectrum and damage control. Earthq Eng Struct Dyn
@@ -317,21 +353,28 @@ class IMs():
 		acclist=[0]
 		t1=[]
 		t2=[]
-		for i in range(len(acc)):
-			acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
-		for i1 in range(len(acclist)):
-			if acclist[i1]>=thresholdt1:
-				t1.append(i1*t)
-				break
-		for i2 in range(len(acclist)):
-			if acclist[i2]>=thresholdt2:
-				t2.append(i2*t)
-				break
+		# for i in range(len(acc)):
+		# 	acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
+		[acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1]) for i in range(len(acc))]
+		# for i1 in range(len(acclist)):
+		# 	if acclist[i1]>=thresholdt1:
+		# 		t1.append(i1*t)
+		# 		break
+		t1_value = next((i1 * t for i1 in range(len(acclist)) if acclist[i1] >= thresholdt1), None)
+		if t1_value is not None:
+			t1.append(t1_value)
+		# for i2 in range(len(acclist)):
+		# 	if acclist[i2]>=thresholdt2:
+		# 		t2.append(i2*t)
+		# 		break
+		t2_value = next((i2 * t for i2 in range(len(acclist)) if acclist[i2] >= thresholdt2), None)
+		if t2_value is not None:
+			t2.append(t2_value)
 		td=t2[0]-t1[0]
 		pgv=self.PGV()
 		Iv=pgv**(2.0/3.0)*(td**(1.0/3.0))
 		return Iv
-	###############################
+	####################################################################################################################
 	def Id (self):
 		#Compound disp.-related IM (cm.s**1/3)
 		##Riddell R, Garcia J (2001) Hysteretic energy spectrum and damage control. Earthq Eng Struct Dyn
@@ -345,21 +388,29 @@ class IMs():
 		acclist=[0]
 		t1=[]
 		t2=[]
-		for i in range(len(acc)):
-			acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
-		for i1 in range(len(acclist)):
-			if acclist[i1]>=thresholdt1:
-				t1.append(i1*t)
-				break
-		for i2 in range(len(acclist)):
-			if acclist[i2]>=thresholdt2:
-				t2.append(i2*t)
-				break
+		# for i in range(len(acc)):
+		# 	acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1])
+		[acclist.append((math.pi/(2*9.81))*(acc[i]**2*self.t)+acclist[-1]) for i in range(len(acc))]
+		# for i1 in range(len(acclist)):
+		# 	if acclist[i1]>=thresholdt1:
+		# 		t1.append(i1*t)
+		# 		break
+		t1_value = next((i1 * t for i1 in range(len(acclist)) if acclist[i1] >= thresholdt1), None)
+		if t1_value is not None:
+			t1.append(t1_value)
+		# for i2 in range(len(acclist)):
+		# 	if acclist[i2]>=thresholdt2:
+		# 		t2.append(i2*t)
+		# 		break
+		t2_value = next((i2 * t for i2 in range(len(acclist)) if acclist[i2] >= thresholdt2), None)
+		if t2_value is not None:
+			t2.append(t2_value)
 		td=t2[0]-t1[0]
 		pgd=self.PGD()
 		Id=pgd*(td**(1.0/3.0))
 		return Id
-#################################################
+########################################################################################################################
+########################################################################################################################
 if __name__=='__main__':
 	acc = np.loadtxt("1.txt")
 	imInstance = IMs(acc, 0.01)
