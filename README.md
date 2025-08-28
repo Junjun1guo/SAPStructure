@@ -32,11 +32,11 @@ Prepare your own openseespy model by referring the examples
 ## Tutorials-2
 ### Auxiliary modules
 1. #### CalculateGroundMotionIMs module
-   a class for calculate ground motion intensity measure. please use the command print(help(CalculateGroundMotionIMs)) to check the structure and the usage of the    class
+   a class for calculate ground motion intensity measure. please use the command print(help(CalculateGroundMotionIMs)) to check the structure and the usage of the class, check example 5.
 2. #### GroundMotionProcess modulea 
    class for ground motion baseline correction ,fltering, and conversion among acceleration,velocity and displacement, please use the  command print(help(GroundMotionProcess)) to check the structure and the usage of the class
 3. #### OpenSeesPyX module
-   a class for the visualization and quick construction of OpenSeesPy model. please use the command print(help(OpenSeesPyX)) to check the structure    and the usage of    the class
+   a class for the visualization and quick construction of OpenSeesPy model. please use the command print(help(OpenSeesPyX)) to check the structure    and the usage of    the class, check example 1.
 4. #### SectionPropertyCalculate module
    a class for calculating the section properties. please use the command print(help(SectionPropertyCalculate)) to check the structure    and the usage of the class
 5. #### SectMCAnalysis module
@@ -47,6 +47,8 @@ Prepare your own openseespy model by referring the examples
    a class for python  interacting with the SAP2000 program.
 8. #### ShakeTableTest module
    a class for processing shake table test data, such as calculating the periods and damping ratios of a structure
+9. #### ResponseSpectraCalculation
+   a class for calculating acceleration, velocity and displacement spectra of ground motions. Check example 4 for more details.
 
 ______  
 ## Tutorial-3      
