@@ -14,7 +14,11 @@ import pandas as pd
 from time import time
 import openseespy.opensees as ops
 import sys
-sys.path.append("..")
+########################################################################################################################
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 ############################----import auxiliary modules---#######################################
 ###---CalculateGroundMotionIMs is a class for calculate ground motion intensity measure,please use the command
 ###---print(help(CalculateGroundMotionIMs)) to check the structure and the usage of the class
@@ -443,11 +447,11 @@ end=time()
 print("写入数据库时间为:",end-start)
 # ########################################################################################################################
 # ##########################################---重力分析---##################################################################
-# opsX.integration_analysisGravity(totalStep=1,recordList=recordList) ###---采用集成式方法进行自重分析(包装了自重分析相关命令)
-# opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
+opsX.integration_analysisGravity(totalStep=1,recordList=recordList) ###---采用集成式方法进行自重分析(包装了自重分析相关命令)
+opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 # ########################################################################################################################
 # ##########################################---模态分析---##################################################################
-# opsX.integration_analysisModal(numModes=50) ###---采用集成式方法进行自重分析(包装了模态分析相关命令)
+opsX.integration_analysisModal(numModes=50) ###---采用集成式方法进行自重分析(包装了模态分析相关命令)
 # ####---opsX.integration_analysisModalProperties(numEigen=50,pflag=1,outname=None) ###---详细动力特性分析
 # ########################################################################################################################
 # ##########################################---时程分析---##################################################################
@@ -459,6 +463,6 @@ acc_Z = 'inputGroundMotion/vertical/1.txt'
 # opsX.integration_earthquakeExcite(RayleighDamping=['mode-1',dampingRatio,Tstart,Tend],waveLenth=length,dt=dt,
 # 								  dirList=[1],motionList=[pathName],recordList=None)
 #####----RayleighDamping=['mode-2',alphaM,betaK,betaKinit,betaKcommit],RayleighDamping=['mode-1',dampingRatio,Tstart,Tend]
-# opsX.integration_earthquakeExcite(['mode-1',0.03, 13.385, 0.206], waveLenth=waveLength,
-#                                      dt=dt, dirList=[1, 3], motionList=[acc_X, acc_Z],recordList=recordList,waveNumber=1)
+opsX.integration_earthquakeExcite(['mode-1',0.03, 13.385, 0.206], waveLenth=waveLength,
+                                     dt=dt, dirList=[1, 3], motionList=[acc_X, acc_Z],recordList=recordList,waveNumber=1)
 # ########################################################################################################################
