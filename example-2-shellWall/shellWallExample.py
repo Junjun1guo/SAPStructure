@@ -16,7 +16,11 @@ from openseespy.opensees import *
 
 import matplotlib.pyplot as plt
 import sys
-sys.path.append("..")
+########################################################################################################################
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 ############################----import auxiliary modules---#######################################
 ###---CalculateGroundMotionIMs is a class for calculate ground motion intensity measure,please use the command
 ###---print(help(CalculateGroundMotionIMs)) to check the structure and the usage of the class
