@@ -294,8 +294,8 @@ class SectionPropertyCalculate():
         """
         pass
 
-    def dxf_sectionproperties(self,dxfFileName,layerName,scaleFactor=50,meshSize=0.05,numCircleSeg=50, numArcSeg=10,
-        numEllipseSeg=20,numSplineSeg=20):
+    def dxf_sectionproperties(self,dxfFileName,layerName,scaleFactor=50,meshSize=0.05,numCircleSeg=50,numArcSeg=10,
+                              numEllipseSeg=20,numSplineSeg=20):
         """
         ----------------------------------------------------------------------------------------------------------------
         ---Cross sectional properties calculation based on dxf file class---
@@ -1551,9 +1551,41 @@ class EleMeshPlotAndSelect():
         """
         self.instance.selectFaces_inPlane(planeNode1Tag,planeNode2Tag,planeNode3Tag,saveSetName)
 
-
-
-
+########################################################################################################################
+########################################################################################################################
+def responseSpectraCalculation(acc:list,dt:float,T:list,beta:float):
+    """
+    --------------------------------------------------------------------------------------------------------------------
+    A class for acceleration,velocity and displacement response spectra calculation
+    Environemet: Successfully executed in python 3.13
+    Date: 2025-08-27
+    --------------------------------------------------------------------------------------------------------------------
+    Input parameters:
+        acc:acceleration time history(g)
+        dt:time interval(s)
+        T:periods list
+        beta:damping ratio
+    OutPuts:
+        Sa(g),Sv(cm/s),Sd(cm)
+    --------------------------------------------------------------------------------------------------------------------
+    ** **************************************************************************** **
+    ** (C) Copyright 2025, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
+    --------------------------------------------------------------------------------------------------------------------
+    ###---Example
+        An example of is provided in the example.py file in the directory named responseSpectCalculate
+    --------------------------------------------------------------------------------------------------------------------
+    """
+    from .responseSpectCalculate.responseSpectraCalculate import SaSvSd
+    saArray, svArray, sdArray = SaSvSd(acc,dt,T,beta)
+    return saArray, svArray, sdArray
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
