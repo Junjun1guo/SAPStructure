@@ -1386,8 +1386,194 @@ class HystereticCurveAnalysis():
         self.instance.plotLoop(loopNumber,saveData,saveFig)
 ########################################################################################################################
 ########################################################################################################################
-class UniaxialMaterialTest():
-    pass
+class DisplacementHistory():
+    """
+    --------------------------------------------------------------------------------------------------------------------
+     A class for generating several types of displacement history
+    --------------------------------------------------------------------------------------------------------------------
+    ** **************************************************************************** **
+    ** (C) Copyright 2025, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
+    --------------------------------------------------------------------------------------------------------------------
+    ###---Example
+    --------------------------------------------------------------------------------------------------------------------
+    """
+    def __init__(self):
+        """"""
+        pass
+
+    def monotonicDisp(self,numDivide:int=100,maxDisp:float=1,scaleFactor:float=1,plotDispHistory:bool=False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for monotonic loading
+        ----------------------------------------------------------------------------------------------------------------
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance=DisplacementHistory()
+        dispHistory=dispInstance.monotonicDispHistory(numDivide,maxDisp,scaleFactor,plotDispHistory)
+        return dispHistory
+
+    def cyclicOneSideConstPeak(self,numCycle:int=1,numDivide:int=100,maxDisp:float=1,scaleFactor:float=1,
+                               plotDispHistory:bool=False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for constant peak values on positive or negtive side
+        ----------------------------------------------------------------------------------------------------------------
+        :param numCycle(int): number of cycles for the disp history, default=1
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance = DisplacementHistory()
+        dispHistory = dispInstance.cyclicOneSideConstPeak(numCycle,numDivide,maxDisp,scaleFactor,plotDispHistory)
+        return dispHistory
+
+    def cyclicOneSideLinearIncrPeak(self,numCycle:int=1,numDivide:int=100,maxDisp:float=1,scaleFactor:float=1,
+                               plotDispHistory:bool=False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for linear incremental peak on positive or negtive side
+        ----------------------------------------------------------------------------------------------------------------
+        :param numCycle(int): number of cycles for the disp history, default=1
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance = DisplacementHistory()
+        dispHistory = dispInstance.cyclicOneSideLinearIncrPeak(numCycle,numDivide,maxDisp,scaleFactor,plotDispHistory)
+        return dispHistory
+
+    def cyclicOneSideLinearIncrPeak_nConst(self,numCycle:int=1,numDivide:int=100,maxDisp:float=1,scaleFactor:float=1,
+                                           numLocalConst:int=2,plotDispHistory:bool=False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for linear incremental peak on positive or negtive side, and has
+        n local const peak
+        ----------------------------------------------------------------------------------------------------------------
+        :param numCycle(int): number of cycles for the disp history, default=1
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param numLocalConst(int): number of local constant peaks, default=2
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance = DisplacementHistory()
+        dispHistory = dispInstance.cyclicOneSideLinearIncrPeak_nConst(numCycle,numDivide,maxDisp,scaleFactor,
+                                                                      numLocalConst,plotDispHistory)
+        return dispHistory
+
+    def cyclicTwoSideConstPeak(self, numCycle: int = 1, numDivide: int = 100, maxDisp: float = 1,
+                               scaleFactor: float = 1,plotDispHistory: bool = False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for constant peak values on both positive and negtive sides
+        ----------------------------------------------------------------------------------------------------------------
+        :param numCycle(int): number of cycles for the disp history, default=1
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance = DisplacementHistory()
+        dispHistory = dispInstance.cyclicTwoSideConstPeak(numCycle, numDivide, maxDisp,scaleFactor,plotDispHistory)
+        return dispHistory
+
+    def cyclicTwoSideLinearIncrPeak(self,numCycle:int=1,numDivide:int=100,maxDisp:float=1,scaleFactor:float=1,
+                               plotDispHistory:bool=False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for linear incremental peak on both positive and negative sides
+        ----------------------------------------------------------------------------------------------------------------
+        :param numCycle(int): number of cycles for the disp history, default=1
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance = DisplacementHistory()
+        dispHistory = dispInstance.cyclicTwoSideLinearIncrPeak(numCycle,numDivide,maxDisp,scaleFactor,plotDispHistory)
+        return dispHistory
+
+    def cyclicTwoSideLinearIncrPeak_nConst(self,numCycle:int=1,numDivide:int=100,maxDisp:float=1,scaleFactor:float=1,
+                                           numLocalConst:int=2,plotDispHistory:bool=False):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        This class generates a displacement history for linear incremental peak on both positive and negative sides,
+        and has n local const peak
+        ----------------------------------------------------------------------------------------------------------------
+        :param numCycle(int): number of cycles for the disp history, default=1
+        :param numDivide(int):number of divisions for the maximum displacement, default=100
+        :param maxDisp(float):maximum displacement, positive means positive tangent for staring line,default=1
+        :param scaleFactor(float):scale factor for the maximum displacement,default=1
+        :param numLocalConst(int): number of local constant peaks, default=2
+        :param plotDispHistory(bool): whether to plot displacement history, default=False
+        :return:displacement history
+        """
+        from .materialTest.displacementHistory import DisplacementHistory
+        dispInstance = DisplacementHistory()
+        dispHistory = dispInstance.cyclicTwoSideLinearIncrPeak_nConst(numCycle,numDivide,maxDisp,scaleFactor,
+                                                                      numLocalConst,plotDispHistory)
+        return dispHistory
+########################################################################################################################
+########################################################################################################################
+class MaterialTest():
+    """
+    --------------------------------------------------------------------------------------------------------------------
+    A class for hysteretic curve of  material in OPenSeesPy software.
+    Environemet: Successfully executed in python 3.13
+    Date: 2025-08-28
+    --------------------------------------------------------------------------------------------------------------------
+    Units: Length-m, Force-kN, mass-ton, Stress-kpa(10e-3MPa), g=9.81m/s2
+    --------------------------------------------------------------------------------------------------------------------
+    ** **************************************************************************** **
+    ** (C) Copyright 2025, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
+    --------------------------------------------------------------------------------------------------------------------
+    ###---Example
+    --------------------------------------------------------------------------------------------------------------------
+    """
+    def __init__(self):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        Initialize the class
+        ----------------------------------------------------------------------------------------------------------------
+        """
+    def uniaixalMaterialTest(self,materialStr,dispHistory):
+        """"""
+        from .materialTest.uniaxialMaterialTest import uniaxialMatTest
+        return uniaxialMatTest(materialStr,dispHistory)
+
 ########################################################################################################################
 ########################################################################################################################
 class EleMeshPlotAndSelect():
