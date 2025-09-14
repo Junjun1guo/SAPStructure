@@ -47,5 +47,10 @@ dispHistory= dispInstance.cyclicTwoSideLinearIncrPeak(numCycle=10,numDivide=20,m
 #                                        numLocalConst=2,plotDispHistory=True)
 ########################################################################################################################
 materialTestInstance=MaterialTest()
-dispList,forceList=materialTestInstance.uniaixalMaterialTest("uniaxialMaterial('Concrete02',1,-45000,-0.02,-10000,-0.08,0.4,5,5000000)",
+##################################
+# dispList,forceList=materialTestInstance.uniaixalMaterialTest("uniaxialMaterial('PySimple1',3000,2,815,0.0142771,0.3)",
+#                                                              dispHistory)
+# dispList,forceList=materialTestInstance.uniaixalMaterialTest("uniaxialMaterial('QzSimple1',6000,2,1800,0.0142)",
+#                                                              dispHistory)
+dispList,forceList=materialTestInstance.uniaixalMaterialTest("uniaxialMaterial('TzSimple1',1,2,1.8*80,0.0014588)",
                                                              dispHistory)

@@ -10,6 +10,8 @@
 ########################---import modules---#################################
 import h5py
 import os
+import numpy as np
+import fnmatch
 ########################################################################################################################
 class h5pyDB(object):
     """Save the data to sqlite database"""
@@ -21,7 +23,8 @@ class h5pyDB(object):
         """
         self._dbPath = dbPath
         self.values=0
-#
+        self.resultFileName=dbPath
+
     @classmethod
     def initDB(self,dbPath):
         """Initialize the database"""
@@ -466,6 +469,116 @@ class h5pyDB(object):
             else:
                 print(f'''table {tableName} doesn't exitst!''')
                 return None,None
+    ####################################################################################################################
+    ####################################################################################################################
+    @classmethod
+    def dataSetsInGroup(cls, dbPath, groupName):
+        """
+        """
+        with h5py.File(dbPath, 'r') as f:
+            if groupName in f:
+                group = f[groupName]
+                datasets = list(group.keys())
+                return datasets
+            else:
+                print(f"Group {groupName} does not exist.")
+                return None
+
+    @classmethod
+    def partialMatchGroups(cls, dbPath, partialGroupName):
+        """"""
+        with h5py.File(dbPath, 'r') as f:
+            matching_groups = []
+            for group_name in f.keys():
+                partialName = f"{partialGroupName}*"
+                if fnmatch.fnmatch(group_name, partialName):
+                    matching_groups.append(group_name)
+            return matching_groups
+
+    @classmethod
+    def partialMatchDataSets(cls, dbPath, groupName, partialDataSetName):
+        """"""
+        with h5py.File(dbPath, 'r') as f:
+            group = f[groupName]
+            partial_name = f'{partialDataSetName}*'
+            matching_datasets = []
+            for name, item in group.items():
+                if isinstance(item, h5py.Dataset):
+                    if fnmatch.fnmatch(name, partial_name):
+                        matching_datasets.append(name)
+            return matching_datasets
+
+    @classmethod
+    def deleteData(cls, dbPath, dataSetName):
+        """"""
+        with h5py.File(dbPath, 'a') as f:
+            if dataSetName in f:
+                del f[dataSetName]
+
+    def saveResult(self,dataName,resultsList,headNameList,operationIndexStr='replace'):
+        """
+        ---A general save template for hdf5 database ---
+        Save results to database, resultsList=[[result0_0,result0_1,],[],...]
+        headNameList=[headName_0,headName_1,...]
+        dataName(str)
+        operationIndexStr='replace' or 'append'
+                          'replace' means replace the data, 'append' means append data after the last row
+        """
+        if len(resultsList)>0:
+            list0 = resultsList[0]
+            saveTypeList = []
+            typeDict = {"int": "np.int32", "float": "np.float32", "str": "h5py.string_dtype(encoding='utf-8')"}
+            saveTypeList=[typeDict["int"] if isinstance(eachValue, (int,np.int64,np.uint64)) else
+                typeDict["float"] if isinstance(eachValue, (float, np.float64)) else
+                typeDict["str"] if isinstance(eachValue, str) else None  for eachValue in list0]
+
+            dtypeStr = "np.dtype(["
+            dtypeStr += ''.join([f"('{headNameList[i1]}',{saveTypeList[i1]})," for i1 in range(len(list0) - 1)])
+            dtypeStr += f"('{headNameList[-1]}',{saveTypeList[-1]})])"
+            dtype = eval(dtypeStr)
+            structured_data = np.zeros(len(resultsList), dtype=dtype)
+            for i2 in range(len(headNameList)):
+                structured_data[headNameList[i2]] = [each[i2] for each in resultsList]
+
+            with h5py.File(self.resultFileName, 'a') as f:
+                dataset = f.get(dataName)
+                if dataset is None:
+                    dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype,chunks=True,
+                                               compression='gzip',compression_opts=9,shuffle=True)
+                    new_size = len(resultsList)
+                    dataset.resize(new_size, axis=0)
+                    dataset[0:new_size] = structured_data
+                else:
+                    if operationIndexStr == 'replace':
+                        del f[dataName]
+                        dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype,chunks=True,
+                                               compression='gzip',compression_opts=9,shuffle=True)
+                        new_size = len(resultsList)
+                        dataset.resize(new_size, axis=0)
+                        dataset[0:new_size] = structured_data
+                    elif operationIndexStr == 'append':
+                        original_size = dataset.shape[0]
+                        new_size = original_size + len(resultsList)
+                        dataset.resize(new_size, axis=0)
+                        dataset[original_size:new_size] = structured_data
+
+    @classmethod
+    def getResult(cls, dbPath, dataName):
+        """
+        dataName(str)---multi-level data table name,eg. 'group/dataSetName'
+        """
+        with h5py.File(dbPath, 'r') as f:
+            dataSet = f.get(dataName)
+            if dataSet is not None:
+                returnList = []
+                [[tempList := [], [tempList.append(each.decode("utf-8")) if isinstance(each, bytes) else
+                                   tempList.append(float(each)) if isinstance(each, (np.float32, np.float64)) else
+                                   tempList.append(int(each)) if isinstance(each, np.int32) else None
+                                   for each in eachRow], returnList.append(tempList)] for eachRow in dataSet[:]]
+                return returnList
+            else:
+                print(f'''table {dataName} doesn't exitst!''')
+                return None
 ########################################################################################################################
 ########################################################################################################################
 # if __name__ == '__main__':

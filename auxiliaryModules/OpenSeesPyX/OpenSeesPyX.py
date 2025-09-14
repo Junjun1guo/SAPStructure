@@ -384,9 +384,53 @@ class OpenSeesPyX():
                 eleLocCoordDict[eachItem[1]].append(eachItem[0])
         [self.saveInstance.saveEleLocalCoordSys(SaveName=eachKey,EleLocalCoordSys=eleLocCoordDict[eachKey])
          for eachKey in eleLocCoordDict.keys()]
-        self.EleLocalCoordSys=[]
+        #####---for node informaiton display
+        nodeTags=ops.getNodeTags()
+        # for eachNode in nodeTags:
+        #     saveName=f"nodeInformationDisplay/{eachNode}"
+        #     savedValueList = [[eachNode,str(ops.nodeCoord(eachNode)),str(ops.nodeMass(eachNode)),str(ops.nodeDOFs(eachNode))]]
+        #     headNameList = ["nodeTag","nodeCoord.","nodeMass","nodeDOFs"]
+        #     operationIndexStr = 'replace'
+        #     self.saveInstance.saveResult(saveName, savedValueList, headNameList, operationIndexStr)
+        [[saveName:=f"nodeInformationDisplay/{eachNode}",savedValueList:= [[eachNode,str(ops.nodeCoord(eachNode)),
+        str(ops.nodeMass(eachNode)),str(ops.nodeDOFs(eachNode))]],headNameList:=["nodeTag","nodeCoord.","nodeMass","nodeDOFs"],
+          operationIndexStr:= 'replace',self.saveInstance.saveResult(saveName, savedValueList, headNameList, operationIndexStr)
+          ] for eachNode in nodeTags]
+        #####---
 
 
+    ####################################################################################################################
+    def auxiliary_writeDataIntoTxtFile(self,savePath,filename,listData,decimals):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        Write list data into txt file
+        ----------------------------------------------------------------------------------------------------------------
+        Inputs:
+            savePath(str)-the path of the saved file, e.g. 'Period\1'
+            filename(str)-the name of the file, e.g. 'period'
+            listData(list[list])-the nested list to store the data, e.g. [[1,2,3,4],[0.12,0.22,0.333,0.412]]
+                                the first list ([1,2,3,4]) will be saved as the first column in the file
+            decimals(list[int])-to specify the decimal for each column data in the file, e.g. [0,2]
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        if not listData:
+            raise ValueError("listData cannot be empty!")
+        ncols = len(listData)
+        nrows = len(listData[0])
+        if any(len(c) != nrows for c in listData):
+            raise ValueError("All columns should be the same size!")
+        if isinstance(decimals, int):
+            decimals = [decimals] * ncols
+        if len(decimals) != ncols:
+            raise ValueError("decimals must be a single integer or a list of integers the same as the number of columns!")
+        fmts = [f"{{:.{d}f}}" for d in decimals]
+        with open(f"{savePath}/{filename}.txt", 'w+', encoding='utf-8') as f:
+            # for row in zip(*listData):
+            #     line = ' '.join(fmt.format(val) for fmt, val in zip(fmts, row))
+            #     f.write(line + '\n')
+            [[line:= ' '.join(fmt.format(val) for fmt, val in zip(fmts, row)),f.write(line + '\n')]
+             for row in zip(*listData)]
+    ####################################################################################################################
     def node(self,*args):
         """
         ----------------------------------------------------------------------------------------------------------------
