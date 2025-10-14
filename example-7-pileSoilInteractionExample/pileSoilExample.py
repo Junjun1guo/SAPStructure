@@ -669,6 +669,10 @@ for Scale in range(1,2,1):
         ops.setTime(0.0)
         ops.wipeAnalysis()
         ops.remove("recorders")
+        ############################################################################################################
+        opsX.auxiliary_writeModelInformationToDB()  ###---将模型信息写入数据库，以便在SAPStructure中显示模型
+        ################################################################################################################
+        # opsX.integration_analysisModal(numModes=50)  ###---采用集成式方法进行自重分析(包装了模态分析相关命令)
         ########################################
         ### Beginning Modal Analysis..."
         ### determine Natural Period, Frequency & damping parameters for SDOF
@@ -682,12 +686,15 @@ for Scale in range(1,2,1):
             periodList.append(Ti)
             print(f"{i+1}th period is: {Ti}")
         ################################################################################################################
-        opsX.auxiliary_writeModelInformationToDB()  ###---将模型信息写入数据库，以便在SAPStructure中显示模型
-        #################################################################################################################
+
+        ################################################################################################################
         periodPath=os.path.join("Period", f"{caseNum}")
         os.makedirs(periodPath, exist_ok=True)
         opsX.auxiliary_writeDataIntoTxtFile(savePath=periodPath,filename='period',listData=[periodList],decimals=[6])
+        ################################################################################################################
 
+
+        ################################################################################################################
         xDamp=0.05
         MpropSwitch=1.0
         KcurrSwitch=1.0

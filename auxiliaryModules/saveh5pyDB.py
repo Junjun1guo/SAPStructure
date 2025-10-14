@@ -12,6 +12,7 @@ import h5py
 import os
 import numpy as np
 import fnmatch
+import datetime
 ########################################################################################################################
 class h5pyDB(object):
     """Save the data to sqlite database"""
@@ -579,6 +580,229 @@ class h5pyDB(object):
             else:
                 print(f'''table {dataName} doesn't exitst!''')
                 return None
+
+    def saveMultiRespInOneSet(self, dataName, resultsList, headNameList, operationIndexStr, respDim, keysList):
+        """
+        ---A general save same type individuals template for hdf5 database ---
+        Save results to database, resultsList=[[node_1_v1_node_1_v2...,...,node_n_v1,node_n_v2...,],[],...]
+        headNameList=[node_1_v1_node_1_v2...,...,node_n_v1,node_n_v2...,...]
+        dataName(str)
+        operationIndexStr='replace' or 'append'
+                          'replace' means replace the data, 'append' means append data after the last row
+        respDim(int)-response columns for each individual
+        keysList(list(int))-the tag list for each individual
+        """
+        if len(resultsList) > 0:
+            list0 = resultsList[0]
+            typeDict = {"int": "np.int32", "float": "np.float32", "str": "h5py.string_dtype(encoding='utf-8')"}
+            saveTypeList = [typeDict["int"] if isinstance(eachValue, (int, np.int64, np.uint64)) else
+                            typeDict["float"] if isinstance(eachValue, (float, np.float64)) else
+                            typeDict["str"] if isinstance(eachValue, str) else None for eachValue in list0]
+
+            dtypeStr = "np.dtype(["
+            dtypeStr += ''.join([f"('{headNameList[i1]}',{saveTypeList[i1]})," for i1 in range(len(list0) - 1)])
+            dtypeStr += f"('{headNameList[-1]}',{saveTypeList[-1]})])"
+            dtype = eval(dtypeStr)
+            structured_data = np.zeros(len(resultsList), dtype="np.float32")
+            for i2 in range(len(headNameList)):
+                structured_data[headNameList[i2]] = [each[i2] for each in resultsList]
+
+            with h5py.File(self.resultFileName, 'a') as f:
+                dataset = f.get(dataName)
+                if dataset is None:
+                    dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype, chunks=True,
+                                               compression='gzip', compression_opts=9, shuffle=True)
+                    new_size = len(resultsList)
+                    dataset.resize(new_size, axis=0)
+                    dataset[0:new_size] = structured_data
+                else:
+                    if operationIndexStr == 'replace':
+                        del f[dataName]
+                        dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype, chunks=True,
+                                                   compression='gzip', compression_opts=9, shuffle=True)
+                        new_size = len(resultsList)
+                        dataset.resize(new_size, axis=0)
+                        dataset[0:new_size] = structured_data
+                    elif operationIndexStr == 'append':
+                        original_size = dataset.shape[0]
+                        new_size = original_size + len(resultsList)
+                        dataset.resize(new_size, axis=0)
+                        dataset[original_size:new_size] = structured_data
+                dataset.attrs['respDim'] = respDim
+                dataset.attrs['keysList'] = keysList
+########################################################################################################################
+########################################################################################################################
+    @classmethod
+    def datasets_hierarchy(cls, file_path):
+        """get dataset names hierarchy"""
+        out = []
+        with h5py.File(file_path, 'r') as f:
+            def visitor(name, obj):
+                if isinstance(obj, h5py.Dataset):
+                    out.append('/' + name)
+            f.visititems(visitor)
+        return sorted(out)
+########################################################################################################################
+########################################################################################################################
+    def append_matrix_h5(self,dset_name, block, col_names=None,respDim=None,keys=None, chunk_rows=200):
+        """
+        Append a 2D numpy array to an HDF5 dataset, creating the dataset on first write.
+        Parameters
+        - dset_name��str): dataset name inside file,e.g. "timehistoryresponse"
+        - block: 2D numpy ndarray,[[node1_val1_t0,node1_valu2_t0,...,noden_val1_t0,...],[],...]
+        - col_names(list(str)): optional list/tuple of column names (length must equal number of columns). ["node1_val1","node1_val2",...]
+        -respDim(int)-the response dimension
+        -keys(list): the tags of nodes or elements, e.g.[2,3,45,6]
+        - chunk_rows(int): suggestion for chunking rows when creating dataset
+        """
+
+        fname=self.resultFileName
+        if not isinstance(block, np.ndarray) or block.ndim != 2:
+            raise ValueError("saveValues must be a 2D numpy ndarray")
+        nrows, ncols = block.shape
+        if col_names is not None:
+            if len(col_names) != ncols:
+                raise ValueError("col_names length must equal number of columns")
+        # Fast homogeneous numeric/datetime path
+        if block.dtype.kind in ('f', 'i', 'u', 'b'): # whether belongs to numericals or bool
+            ds=None
+            with h5py.File(fname, 'a', libver='latest') as f: ### latest version
+                if dset_name in f:
+                    ds = f[dset_name]
+                    if ds.ndim != 2 or ds.shape[1] != ncols:
+                        raise ValueError("existing dataset incompatible with this save values")
+                    old = ds.shape[0] # number of existing rows
+                    ds.resize((old + nrows, ncols)) #resize dataset
+                    ds[old:old + nrows, :] = block.astype(ds.dtype, copy=False)
+                    ds[old:old + nrows, :] = block  ### write block to ds
+                else: # if not exist, creat a dataset
+                    maxshape = (None, ncols)
+                    chunks = (min(chunk_rows, nrows), ncols) ### chunks store
+                    ds = f.create_dataset(
+                        dset_name,
+                        shape=(nrows, ncols),
+                        maxshape=maxshape,
+                        dtype=block.dtype,
+                        chunks=chunks,
+                        compression=None
+                    )
+                    ds[:, :] = block  ### write block to ds
+                if col_names is not None:
+                    ds.attrs['col_names'] = col_names
+                if respDim is not None:
+                    ds.attrs['respDim'] = respDim
+                if keys is not None:
+                    ds.attrs['keys'] = keys
+                f.flush() ### flush data into disk
+            return
+        #################################################################################
+        ##################################################################################
+        def _infer_col(col):
+            """Return (kind_str, dtype) for a 1D numpy column."""
+            col = np.asarray(col)  ### to check data type
+            dt = col.dtype
+            if dt.kind in ('i', 'u'):  ### data type
+                return 'int', np.int32
+            if dt.kind == 'f':
+                return 'float', np.float32
+            if dt.kind == 'b':
+                return 'bool', np.bool_
+
+            # object / mixed: scan once
+            has_str = has_float = has_int = has_bool = False
+            for v in col:
+                if v is None:
+                    has_str = True
+                    continue
+                if isinstance(v, bool):
+                    has_bool = True
+                    continue
+                if isinstance(v, (int, np.integer)) and not isinstance(v, bool):
+                    has_int = True
+                    continue
+                if isinstance(v, (float, np.floating)):
+                    has_float = True
+                    continue
+                if isinstance(v, (bytes, str, bytearray)):
+                    has_str = True
+                    break
+                try:
+                    float(v)
+                    has_float = True
+                except Exception:
+                    has_str = True
+                    break
+            if has_str:
+                return 'string', h5py.string_dtype(encoding='utf-8')
+            if has_float:
+                return 'float', np.float32
+            if has_int:
+                return 'int', np.int32
+            if has_bool:
+                return 'bool', np.bool_
+            return 'string', h5py.string_dtype(encoding='utf-8')
+        ################################################################################
+        def _convert_col(col, kind):  ### data type convert
+            col = np.asarray(col)
+            n = col.shape[0]
+            if kind == 'int':
+                return col.astype(np.int32)
+            if kind == 'float':
+                return col.astype(np.float32)
+            if kind == 'bool':
+                return col.astype(np.bool_)
+            # string
+            out = np.empty(n, dtype=object)
+            for i, v in enumerate(col):
+                out[i] = '' if v is None else str(v)
+            return out
+        #################################################################################
+        # compound types
+        cols = [block[:, j] for j in range(ncols)]
+        fields = []
+        kinds = []
+        names = []
+        for j, col in enumerate(cols):
+            kind, dt = _infer_col(col) ## column data type determine
+            name = col_names[j] if col_names is not None else f"c{j}"
+            name = str(name)
+            names.append(name)
+            fields.append((name, dt))
+            kinds.append(kind)
+
+        # ensure unique field names
+        if len(set(names)) != len(names):
+            raise ValueError("column names must be unique for compound dataset")
+
+        compound = np.dtype(fields)
+        rec = np.empty(nrows, dtype=compound)
+        for j, name in enumerate(compound.names):
+            rec[name] = _convert_col(cols[j], kinds[j])
+
+        with h5py.File(fname, 'a', libver='latest') as f:
+            if dset_name in f:
+                ds = f[dset_name]
+                if ds.dtype.names is None:
+                    raise ValueError("existing dataset is not compound; cannot append mixed columns")
+                # ensure dtype/field names match exactly
+                if ds.dtype != compound:
+                    raise ValueError("existing dataset dtype (fields/dtypes) mismatch")
+                old = ds.shape[0]
+                ds.resize((old + nrows,))
+                ds[old:old + nrows] = rec
+            else:
+                maxshape = (None,)
+                chunks = (min(chunk_rows, max(1, nrows)),)
+                ds = f.create_dataset(
+                    dset_name,
+                    shape=(nrows,),
+                    maxshape=maxshape,
+                    dtype=compound,
+                    chunks=chunks,
+                    compression=None
+                )
+                ds[:] = rec
+            f.flush()
 ########################################################################################################################
 ########################################################################################################################
 # if __name__ == '__main__':

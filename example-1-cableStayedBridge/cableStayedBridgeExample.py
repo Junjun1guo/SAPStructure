@@ -79,6 +79,7 @@ for each in cableMaterial:
     ops.uniaxialMaterial('ElasticPP', cableMatTag, cableEValue, epsyPValue, epsyNValue, eps0Value)
 # ########################################################################################################################
 # ##########################################---建立拉索单元---##############################################################
+
 cableEle = np.loadtxt('modelInformation/newCableEle.txt')
 for each in cableEle:
     EleTag = int(each[0])
@@ -89,6 +90,7 @@ for each in cableEle:
     opsX.element('Truss', EleTag, NodeI, NodeJ, A, MatTag)
 # ########################################################################################################################
 # ##########################################---建立主梁节点---##############################################################
+
 girderNode = np.loadtxt('modelInformation/GirderNode.txt')
 for each in girderNode:
     nodeTageValue = int(each[0])
@@ -100,6 +102,7 @@ for each in girderNode:
     opsX.node(nodeTageValue, xCoordValue, yCoordValue, zCoordValue, '-mass', nodeMassValue, nodeMassValue,nodeMassValue, 0.0, 0.0, 0.0)
 # ########################################################################################################################
 # ##########################################---建立主梁局部坐标转换---########################################################
+
 girderTransf = np.loadtxt('modelInformation/newGirderTransf.txt')
 for each in girderTransf:
     TransfTag = int(each[0])
@@ -110,6 +113,7 @@ for each in girderTransf:
     opsX.geomTransf('PDelta', TransfTag, localZXCoord, localZYCoord, localZZCoord)
 # ########################################################################################################################
 # ##########################################---建立主梁单元---##############################################################
+
 girderEle = np.loadtxt('modelInformation/GirderEle.txt')
 for each in girderEle:
     EleTag = int(each[0])
@@ -399,7 +403,7 @@ for i1 in range(9):
     opsX.element('zeroLength', springEleNode[i1][0],springEleNode[i1][1],springEleNode[i1][2], '-mat',
                 numbers0,numbers1,numbers2,numbers3,numbers4,numbers5, '-dir', 1, 2,3, 4,5,6,'-orient', 0, 0, 1,
                 brTraf[i1][0], brTraf[i1][1], brTraf[i1][2])
-# opsX.auxiliary_writeModelInformationToDB()  ###---将模型信息写入数据库，以便在SAPBridge中显示模型
+opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 # ########################################################################################################################
 # # opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 # ########################################################################################################################
@@ -422,7 +426,7 @@ for each in nodeList:
 ###########对于zeroLength单元，('zeroEle','deformation',[1,2,3],[2301,2101,3101])
 ##############################('zeroEle','localForce',[1,2,3],[2301,2101,3101])
 ###########对于nonLinearEle单元section，('nonEleSection','sectionForce',1,[41001, 41018, 41019])
-###################('nonEleSection','sectionDeformation',1,[41001, 41018, 41019])
+###################('nonEleSection','sectionDeformation',1,[41001, 41018, 41019]),1 is the integration number
 ###########对于NonZero单元，('nonZeroEle','localForce',[41001, 41018, 41019])
 girderNodeList = [each for each in range(1, 446)]
 nodeRespList = [41129, 51125, 223]
@@ -432,29 +436,33 @@ cableEleList = [each for each in range(45001, 45039)] + [each for each in range(
 BearingList = [2301, 2101, 3101, 4101, 5101]
 BearingList1=[6101, 7101, 8101, 9101]
 springEleList=[19000,29000]
-recordList = [('node', 'disp', girderNodeList), ('node', 'disp', nodeRespList), ('node', 'accel', nodeRespList),
-              ('trussEle', 'axialForce', cableEleList), ('zeroEle', 'deformation', BearingList),
+allNodeslist=ops.getNodeTags()
+recordList = [('node', 'disp', allNodeslist), ('node', 'accel', nodeRespList),
+              ('trussEle', 'axialForce', cableEleList),
+              ('trussEle', 'axialDeform', cableEleList),
+              ('zeroEle', 'deformation', BearingList),
               ('zeroEle', 'deformation', BearingList1),
               ('zeroEle', 'localForce', BearingList),
               ('zeroEle', 'localForce', springEleList),
               ('nonEleSection', 'sectionForce', 1, pylonEleNumList),
               ('nonEleSection', 'sectionDeformation', 1, pylonEleNumList),
-              ('nonZeroEle', 'localForce', [41001, 41018, 41019])]
+              ('nonZeroEle', 'localForce', [41001, 41018, 41019])] ### 1 is the integration number in nonEleSection response
 ########################################################################################################################
 start=time()
 opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
 end=time()
 print("写入数据库时间为:",end-start)
-# ########################################################################################################################
-# ##########################################---重力分析---##################################################################
+########################################################################################################################
+###########################################---重力分析---#################################################################
 opsX.integration_analysisGravity(totalStep=1,recordList=recordList) ###---采用集成式方法进行自重分析(包装了自重分析相关命令)
-opsX.auxiliary_writeModelInformationToDB() ###---将模型信息写入数据库，以便在SAPStructure中显示模型
-# ########################################################################################################################
-# ##########################################---模态分析---##################################################################
+
+########################################################################################################################
+###########################################---模态分析---#################################################################
 opsX.integration_analysisModal(numModes=50) ###---采用集成式方法进行自重分析(包装了模态分析相关命令)
+
 # ####---opsX.integration_analysisModalProperties(numEigen=50,pflag=1,outname=None) ###---详细动力特性分析
-# ########################################################################################################################
-# ##########################################---时程分析---##################################################################
+# ######################################################################################################################
+# ##########################################---时程分析---################################################################
 waveLength =7997
 dt =0.005
 waveNumber=1 ###---地震动编号，用于屏幕输出

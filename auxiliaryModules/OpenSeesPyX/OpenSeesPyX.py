@@ -3,13 +3,14 @@
 #  E-mail: jjguo2@bjtu.edu.cn/guojj_ce@163.com
 #    Date: 05/02/2020
 ########################################################################################################################
+import h5py
 import os
 import numpy as np
 import openseespy.opensees as ops
 import time
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Polygon, Wedge
-from .h5pyDB import h5pyDB  ##h5py database to store opensees results
+from .modelResultsDB import h5pyDB  ##h5py database to store opensees results
 ########################################################################################################################
 class OpenSeesPyX():
     """
@@ -352,9 +353,19 @@ class OpenSeesPyX():
                 nodeDict[eachItem[1]].append(eachItem[0])
             else:
                 nodeDict[eachItem[1]].append(eachItem[0])
-        [self.saveInstance.saveNodes(nodesSaveName=eachKey, nodeList=nodeDict[eachKey]) for eachKey in nodeDict.keys()]
+        # for eachType in nodeDict.keys():
+        #     saveName = f"modelInfo/{eachType}"
+        #     saveValueList=nodeDict[eachType]
+        #     headNameList=["nodeTag","xCoord","yCoord","zCoord"]
+        #     operationIndexStr = 'replace'
+        #     self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)
+        [[saveName:= f"modelInfo/{eachType}",saveValueList:=nodeDict[eachType],
+              headNameList:=["nodeTag","xCoord","yCoord","zCoord"],operationIndexStr:= 'append',
+              self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)]
+             for eachType in nodeDict.keys()]
         self.saveNodeList=[]###---empty the list after writing data to database
-
+        ###############################################################################################################
+        ###############################################################################################################
         geomDict={}
         for eachItem in self.saveGeomfList:
             if eachItem[1] not in geomDict.keys():
@@ -362,9 +373,18 @@ class OpenSeesPyX():
                 geomDict[eachItem[1]].append(eachItem[0])
             else:
                 geomDict[eachItem[1]].append(eachItem[0])
-        [self.saveInstance.saveGeomTransf(geomTransfSaveName=eachKey,geomfList=geomDict[eachKey]) for eachKey in geomDict.keys()]
+        # for eachGeomType in geomDict.keys():
+        #     saveName = f"geomTransf/{eachGeomType}"
+        #     saveValueList=geomDict[eachGeomType]
+        #     headNameList=["geomTransfTag","localZx","localZy","localZz"]
+        #     operationIndexStr = 'replace'
+        #     self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)
+        [[saveName:= f"geomTransf/{eachGeomType}",saveValueList:=geomDict[eachGeomType],
+          headNameList:=["geomTransfTag","localZx","localZy","localZz"],operationIndexStr:= 'append',
+          self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)] for eachGeomType in geomDict.keys()]
         self.saveGeomfList=[]
-
+        ###############################################################################################################
+        ###############################################################################################################
         eleDict={}
         for eachItem in self.saveEleList:
             if eachItem[1] not in eleDict.keys():
@@ -372,9 +392,23 @@ class OpenSeesPyX():
                 eleDict[eachItem[1]].append(eachItem[0])
             else:
                 eleDict[eachItem[1]].append(eachItem[0])
-        [self.saveInstance.saveEles(elesSaveName=eachKey, elesList=eleDict[eachKey]) for eachKey in eleDict.keys()]
+        # for eachEleType in eleDict.keys():
+        #     saveName = f"modelInfo/{eachEleType}"
+        #     saveValueList=eleDict[eachEleType]
+        #     totalItems=len(eleDict[eachEleType][0])-2
+        #     headNameList=["eleTag"]
+        #     for i11 in range(totalItems):
+        #         headNameList.append(f"node_{i11+1}")
+        #     headNameList.append("eleDim")
+        #     operationIndexStr = 'replace'
+        #     self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)
+        [[saveName:= f"modelInfo/{eachEleType}",saveValueList:=eleDict[eachEleType],
+        totalItems:=len(eleDict[eachEleType][0])-2,headNameList:=["eleTag"],[headNameList.append(f"node_{i11+1}")
+        for i11 in range(totalItems)],headNameList.append("eleDim"),operationIndexStr:= 'append',
+            self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)] for eachEleType in eleDict.keys()]
         self.saveEleList=[]
-
+        ###############################################################################################################
+        ###############################################################################################################
         eleLocCoordDict={}
         for eachItem in self.EleLocalCoordSys:
             if eachItem[1] not in eleLocCoordDict.keys():
@@ -382,23 +416,102 @@ class OpenSeesPyX():
                 eleLocCoordDict[eachItem[1]].append(eachItem[0])
             else:
                 eleLocCoordDict[eachItem[1]].append(eachItem[0])
-        [self.saveInstance.saveEleLocalCoordSys(SaveName=eachKey,EleLocalCoordSys=eleLocCoordDict[eachKey])
-         for eachKey in eleLocCoordDict.keys()]
+        # for eachLocCoord in eleLocCoordDict.keys():
+        #     saveName = f"eleLocalCoordSys/{eachLocCoord}"
+        #     saveValueList = eleLocCoordDict[eachLocCoord]
+        #     headNameList=None
+        #     if len(eleLocCoordDict[eachLocCoord][0])==4:
+        #         headNameList = ["eleType", "nodeI", "nodeJ", "geomTransfTag"]
+        #     elif len(eleLocCoordDict[eachLocCoord][0])==9:
+        #         headNameList = ["eleType", "nodeI", "nodeJ", "localX_x", "localX_y", "localX_z","localY_x","localY_y","localY_z"]
+        #     operationIndexStr = 'replace'
+        #     self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)
+        [[saveName:= f"eleLocalCoordSys/{eachLocCoord}",saveValueList:= eleLocCoordDict[eachLocCoord],headNameList:=None,
+          length:= len(eleLocCoordDict[eachLocCoord][0]),headNameList:= {4: ["eleType", "nodeI", "nodeJ", "geomTransfTag"],
+            9: ["eleType", "nodeI", "nodeJ","localX_x", "localX_y", "localX_z","localY_x", "localY_y", "localY_z"],}.get(length, []),
+          operationIndexStr:= 'append',self.saveInstance.saveResult(saveName, saveValueList, headNameList, operationIndexStr)]
+         for eachLocCoord in eleLocCoordDict.keys()]
+        self.EleLocalCoordSys=[]
+        ###############################################################################################################
+        ###############################################################################################################
         #####---for node informaiton display
         nodeTags=ops.getNodeTags()
         # for eachNode in nodeTags:
         #     saveName=f"nodeInformationDisplay/{eachNode}"
-        #     savedValueList = [[eachNode,str(ops.nodeCoord(eachNode)),str(ops.nodeMass(eachNode)),str(ops.nodeDOFs(eachNode))]]
-        #     headNameList = ["nodeTag","nodeCoord.","nodeMass","nodeDOFs"]
+        #     savedValueList = [[eachNode,str(ops.nodeCoord(eachNode)),str(ops.nodeMass(eachNode))]]
+        #     headNameList = ["nodeTag","nodeCoord.","nodeMass"]
         #     operationIndexStr = 'replace'
         #     self.saveInstance.saveResult(saveName, savedValueList, headNameList, operationIndexStr)
         [[saveName:=f"nodeInformationDisplay/{eachNode}",savedValueList:= [[eachNode,str(ops.nodeCoord(eachNode)),
-        str(ops.nodeMass(eachNode)),str(ops.nodeDOFs(eachNode))]],headNameList:=["nodeTag","nodeCoord.","nodeMass","nodeDOFs"],
+        str(ops.nodeMass(eachNode))]],headNameList:=["nodeTag","nodeCoord.","nodeMass"],
           operationIndexStr:= 'replace',self.saveInstance.saveResult(saveName, savedValueList, headNameList, operationIndexStr)
           ] for eachNode in nodeTags]
-        #####---
-
-
+        #####-for element information display
+        ############################################
+        #############################################
+        def key_from_list(lst):
+            return tuple(sorted(lst))
+        #############################################
+        # geomTagInfoDict={}
+        # for eachType in geomDict.keys():
+        #     for eachValue in geomDict[eachType]:
+        #         geomTagInfoDict[eachValue[0]]=[eachType]+eachValue
+        geomTagInfoDict = {eachValue[0]: [eachType] + list(eachValue) for eachType, values in geomDict.items()
+            for eachValue in values}
+        #####################
+        # eleTagInfoDict={}
+        # for eachEleType in eleDict.keys():
+        #     for eachEle in eleDict[eachEleType]:
+        #         eleTagInfoDict[eachEle[0]]=[eachEleType]+eachEle[1:]
+        eleTagInfoDict = {eachEle[0]: [eachEleType] + list(eachEle[1:]) for eachEleType, eles in eleDict.items()
+            for eachEle in eles}
+        ###################
+        # nodesTagLocalCoordDict={}
+        # for eachCordType in eleLocCoordDict.keys():
+        #     for eachNodes in eleLocCoordDict[eachCordType]:
+        #         nodesTagLocalCoordDict[str(eachNodes[1:3])]=[eachCordType]+eachNodes
+        nodesTagLocalCoordDict = {key_from_list(nodes[1:3]): [cordType] + list(nodes) for cordType, nodes_list in eleLocCoordDict.items()
+            for nodes in nodes_list}
+        ###############################################################################################################
+        ###############################################################################################################
+        eleTags=ops.getEleTags()
+        for eachEle in eleTags:
+            try:
+                saveName = f"elementInformationDisplay/{eachEle}"
+                sortedNodes = key_from_list(ops.eleNodes(eachEle))
+                eleType=eleTagInfoDict[eachEle][0]
+                eleDim=eleTagInfoDict[eachEle][-1]
+                try:
+                    specialEleIndex=nodesTagLocalCoordDict[sortedNodes][1]
+                except:
+                    specialEleIndex=None
+                localXYVector=None
+                geomTransform=None
+                localStr=None
+                dirExpress=None
+                if eleDim=='1D':
+                    if specialEleIndex=='specialEle':
+                        localXYVector0=nodesTagLocalCoordDict[sortedNodes][-6:]
+                        localXYVector=[float(each) for each in localXYVector0]
+                    elif specialEleIndex=='realEle':
+                        geomTag=nodesTagLocalCoordDict[sortedNodes][-1]
+                        geomTransform=geomTagInfoDict[geomTag]
+                if localXYVector is not None:
+                    localStr='eleLocalXYvector:'
+                    dirExpress=localXYVector
+                elif geomTransform is not None:
+                    localStr='eleGeomTransf:'
+                    dirExpress=geomTransform
+                else:
+                    localStr=None
+                    dirExpress=None
+                localDirString=f"{localStr}{dirExpress}"
+                savedValueList = [[eachEle,str(sortedNodes),eleType,localDirString]]
+                headNameList = ["eleTag","endNodes","eleType","localDirection"]
+                operationIndexStr = 'replace'
+                self.saveInstance.saveResult(saveName, savedValueList, headNameList, operationIndexStr)
+            except:
+                pass
     ####################################################################################################################
     def auxiliary_writeDataIntoTxtFile(self,savePath,filename,listData,decimals):
         """
@@ -1784,7 +1897,6 @@ class OpenSeesPyX():
             linkstr+=f"{each}"+f","
         linkstr+=f"'{responseType}')"
         eval(linkstr)
-
     ####################################################################################################################
     def integration_recorderElement(self,savePath,filename,eleList,responseTypeList):
         """
@@ -1839,125 +1951,253 @@ class OpenSeesPyX():
         recordList(list)-responses need to be recordedd
         ----------------------------------------------------------------------------------------------------------------
         """
-        totalStep =totalStep
-        ops.system('UmfPack')
-        ops.constraints('Transformation')
-        ops.numberer('RCM')
-        ops.test('NormDispIncr', 1.0e-8, 2000)
-        ops.algorithm('KrylovNewton')
-        ops.integrator('LoadControl',1.0/float(totalStep))
-        ops.analysis('Static')
-        ops.analyze(int(totalStep))
-        ops.loadConst('-time', 0.0) ##-在后续分析步考虑重力作用(将重力视常荷载),并将拟时间置0
-        #######################################################
-        if recordList!=None:
-            nodeDict={}
-            trussEleResponseDict={}
-            zeroEleResponseDict={}
-            zeroEleDirectionDict={}
-            nonEleSectResponsesDict={}
-            nonEleSectNumberDict={}
-            nonZeroEleResponsesDict={}
+        ################################################################################################################
+        def saveDataIntoOpenedDB(f,dataName,resultsList,headNameList,dirList=None):
+            """
+            Save results to database, resultsList=[[result0_0,result0_1,],[],...]
+            headNameList=[headName_0,headName_1,...]
+            dataName(str)
+            operationIndexStr='replace' or 'append' 'replace'
+            """
+            if len(resultsList) > 0:
+                # t1=time.time()
+                list0 = resultsList[0]
+                saveTypeList = []
+                typeDict = {"int": "np.int32", "float": "np.float32", "str": "h5py.string_dtype(encoding='utf-8')"}
+                saveTypeList = [typeDict["int"] if isinstance(eachValue, (int, np.int64, np.uint64)) else
+                                typeDict["float"] if isinstance(eachValue, (float, np.float64)) else
+                                typeDict["str"] if isinstance(eachValue, str) else None for eachValue in list0]
+
+                dtypeStr = "np.dtype(["
+                dtypeStr += ''.join([f"('{headNameList[i1]}',{saveTypeList[i1]})," for i1 in range(len(list0) - 1)])
+                dtypeStr += f"('{headNameList[-1]}',{saveTypeList[-1]})])"
+                dtype = eval(dtypeStr)
+                structured_data = np.zeros(len(resultsList), dtype=dtype)
+                for i2 in range(len(headNameList)):
+                    structured_data[headNameList[i2]] = [each[i2] for each in resultsList]
+                ########################################################################################################
+                # t2=time.time()
+                # print("time1=",t2-t1)
+                dataset = f.get(dataName)
+                # t3 = time.time()
+                if dataset is None:
+                    dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype, chunks=True,compression=None)
+                    new_size = len(resultsList)
+                    dataset.resize(new_size, axis=0)
+                    dataset[0:new_size] = structured_data
+                    if dirList is not None:
+                        dataset.attrs['dirList'] =dirList
+                else:
+                    original_size = dataset.shape[0]
+                    new_size = original_size + len(resultsList)
+                    dataset.resize(new_size, axis=0)
+                    dataset[original_size:new_size] = structured_data
+                # t4 = time.time()
+                # print("time2=", t4 - t3)
+        ################################################################################################################
+        ################################################################################################################
+        f=None
+        if recordList is None:
+            totalStep = totalStep
+            ops.system('UmfPack')
+            ops.constraints('Transformation')
+            ops.numberer('RCM')
+            ops.test('NormDispIncr', 1.0e-3, 200)
+            ops.algorithm('KrylovNewton')
+            ops.integrator('LoadControl', 1.0 / float(totalStep))
+            ops.analysis('Static')
+            ops.analyze(int(totalStep))
+            ops.loadConst('-time', 0.0)  ##-在后续分析步考虑重力作用(将重力视常荷载),并将拟时间置0
+        else:
+            totalStep = totalStep
+            ops.system('UmfPack')
+            ops.constraints('Transformation')
+            ops.numberer('RCM')
+            ops.test('NormDispIncr', 1.0e-3, 200)
+            ops.algorithm('KrylovNewton')
+            ###########################################################################################################
+            dbPath = self.saveInstance._dbPath
+            f = h5py.File(dbPath, 'a', libver='latest')
+            ##############################################
+            nodeDict = {}
+            trussEleResponseDict = {}
+            zeroEleResponseDict = {}
+            zeroEleDirectionDict = {}
+            nonEleSectResponsesDict = {}
+            nonEleSectNumberDict = {}
+            nonZeroEleResponsesDict = {}
             for each in recordList:
-                if each[0]=='node':
-                    nodeIdenty, resType,nodeTags= each[0], each[1], each[2]
-                    nodeItemDict={(nodeIdenty+'_'+resType+'_'+str(eachNode)):[] for eachNode in nodeTags}
-                    nodeDict={**nodeDict,**nodeItemDict}##Merge two dicts
-                elif each[0]=='trussEle':
-                    responseType,eleTags =each[1],each[2]
-                    eleItemDict={('trussEle_'+responseType+'_'+str(eachEle)):[] for eachEle in eleTags}
+                if each[0] == 'node':
+                    nodeIdenty, resType, nodeTags = each[0], each[1], each[2]
+                    nodeItemDict = {(nodeIdenty + '_' + resType + '_' + str(eachNode)): [] for eachNode in nodeTags}
+                    nodeDict = {**nodeDict, **nodeItemDict}  ##Merge two dicts
+                elif each[0] == 'trussEle':
+                    responseType, eleTags = each[1], each[2]
+                    eleItemDict = {('trussEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     trussEleResponseDict = {**trussEleResponseDict, **eleItemDict}  ##Merge two dicts
-                elif each[0]=='zeroEle':
-                    responseType,eleTags = each[1], each[2]
+                elif each[0] == 'zeroEle':
+                    responseType, eleTags = each[1], each[2]
                     eleItemDict = {('zeroEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     zeroEleResponseDict = {**zeroEleResponseDict, **eleItemDict}  ##Merge two dicts
-                    eleDirectDict = {('zeroEle_' + responseType + '_' + str(eachEle)):self.zeroEleDirDict[eachEle] for eachEle in eleTags}
+                    eleDirectDict = {('zeroEle_' + responseType + '_' + str(eachEle)): self.zeroEleDirDict[eachEle] for
+                                     eachEle in eleTags}
                     zeroEleDirectionDict = {**zeroEleDirectionDict, **eleDirectDict}  ##Merge two dicts
-                elif each[0]=='nonEleSection':
-                    responseType,sectNum,eleTags=each[1],each[2],each[3]
-                    eleItemDict = {('nonEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
+                elif each[0] == 'nonEleSection':
+                    responseType, sectNum, eleTags = each[1], each[2], each[3]
+                    eleItemDict = {('nonEleSection_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     nonEleSectResponsesDict = {**nonEleSectResponsesDict, **eleItemDict}  ##Merge two dicts
-                    sectNumDict = {('nonEle_' + responseType + '_' + str(eachEle)): sectNum for eachEle in eleTags}
+                    sectNumDict = {('nonEleSection_' + responseType + '_' + str(eachEle)): sectNum for eachEle in
+                                   eleTags}
                     nonEleSectNumberDict = {**nonEleSectNumberDict, **sectNumDict}  ##Merge two dicts
-                elif each[0]=='nonZeroEle':
-                    responseType,eleTags = each[1], each[2]
+                elif each[0] == 'nonZeroEle':
+                    responseType, eleTags = each[1], each[2]
                     eleItemDict = {('nonZeroEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     nonZeroEleResponsesDict = {**nonZeroEleResponsesDict, **eleItemDict}  ##Merge two dicts
         ####################---recorderProcess---###########
         if recordList != None:
-            if nodeDict:
-                nodeKeys = nodeDict.keys()
-                nodeResNameDict = {'disp': 'nodeDisp', 'vel': 'nodeVel', 'accel': 'nodeAccel',
-                                   'reaction': 'nodeReaction'}
-                [[resType := eachkey.split('_')[1], nodeTag := eachkey.split('_')[2],
-                  tempValue1 := [0.0],
-                  tempValue2 := eval(f"ops.{nodeResNameDict[resType]}({nodeTag})"),
-                  tempValue3 := [round(tempValue2[i1], 6) for i1 in range(3)],
-                  tempValue := tempValue1 + tempValue3,
-                  nodeDict['node_' + resType + '_' + str(nodeTag)].append(tempValue)] for eachkey in
-                 nodeKeys]  ##海象运算符加列表解析
-                [[resType := eachkey.split("_")[1], nodeTag := eachkey.split("_")[2],
-                  saveValueList := nodeDict['node_' + resType + '_' + str(nodeTag)],
-                  self.saveInstance.saveNodeTimeHistory(nodeSaveName=eachkey,
-                nodeHistoryList=saveValueList)] for eachkey in nodeKeys]
-            if trussEleResponseDict:
-                eleKeys = trussEleResponseDict.keys()
-                eleResNameDict = {'axialForce': 'basicForce', 'axialDeform': 'basicDeformation'}
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  tempValue1 := [0.0],
-                  tempValue2 := [round(eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]"), 3)],
-                  tempValue := tempValue1 + tempValue2,
-                  trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)].append(tempValue)] for
-                 eachkey in eleKeys]
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  saveValueList := trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)],
-                  self.saveInstance.saveTrussEleResponseTimeHistory(eleSaveName=eachkey,
-                eleHistoryList=saveValueList)] for eachkey in eleKeys]
-            if zeroEleResponseDict:
-                eleKeys = zeroEleResponseDict.keys()
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  tempValue1 := [0.0],
-                  tempValue2 := eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                  tempValue3 := [round(each, 6) for each in tempValue2],
-                  tempValue := [tempValue1 + tempValue3] + [zeroEleDirectionDict[eachkey]],
-                  zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)].append(tempValue)] for
-                 eachkey in eleKeys]  ##海象操作符
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  saveValueList := zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)][0][0],
-                  dirList:=zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)][0][1],
-                  self.saveInstance.saveZeroEleResponseTimeHistory(eleSaveName=eachkey,
-                eleHistoryList=[saveValueList],dirList=dirList)] for eachkey in eleKeys]
-            if nonEleSectResponsesDict:
-                eleKeys = nonEleSectResponsesDict.keys()
-                digitNumDict = {'sectionForce': 6, 'sectionDeformation': 10}
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  tempValue := [0.0] + [
-                      round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},1)"),
-                            digitNumDict[resType]),
-                      round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},2)"),
-                            digitNumDict[resType]),
-                      round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},3)"),
-                            digitNumDict[resType]),
-                      round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},4)")),
-                      digitNumDict[resType]],
-                  nonEleSectResponsesDict['nonEle_' + resType + '_' + str(eleTag)].append(tempValue)] for
-                 eachkey in eleKeys]
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  saveValueList := nonEleSectResponsesDict['nonEle_' + resType + '_' + str(eleTag)],
-                  self.saveInstance.saveNonEleSectResponseTimeHistory(eleSaveName=eachkey,
-                eleHistoryList=saveValueList)] for eachkey in eleKeys]
-            if nonZeroEleResponsesDict:
-                eleKeys = nonZeroEleResponsesDict.keys()
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  tempValue1 := [0.0],
-                  tempValue2 := eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                  tempValue3 := [round(each, 6) for each in tempValue2],
-                  tempValue := tempValue1 + tempValue3,
-                  nonZeroEleResponsesDict[eachkey].append(tempValue)] for eachkey in eleKeys]
-                [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],
-                  saveValueList := nonZeroEleResponsesDict[eachkey],
-                  self.saveInstance.saveNonZeroEleResponseTimeHistory(eleSaveName=eachkey,
-                    eleHistoryList=saveValueList)] for eachkey in eleKeys]
+            for i1 in range(totalStep):
+                ops.integrator('LoadControl', 1.0 / float(totalStep))
+                ops.analysis('Static')
+                ops.analyze(1)
+                tCurrent = ops.getTime()
+                ######################################################
+                if nodeDict:
+                    nodeKeys = nodeDict.keys()
+                    nodeResNameDict = {'disp': 'nodeDisp', 'vel': 'nodeVel', 'accel': 'nodeAccel',
+                                       'reaction': 'nodeReaction'}
+                    # for eachkey in nodeKeys:
+                    #     resType= eachkey.split('_')[1]
+                    #     nodeTag= eachkey.split('_')[2]
+                    #     tempValue1=[round(tCurrent, 4)]
+                    #     tempValue2= eval(f"ops.{nodeResNameDict[resType]}({nodeTag})")
+                    #     tempValue= tempValue1 + tempValue2
+                    #     nodeDict['node_' + resType + '_' + str(nodeTag)].append(tempValue)
+                    [[resType:= eachkey.split('_')[1],nodeTag:= eachkey.split('_')[2],tempValue1:=[round(tCurrent, 4)],
+                      tempValue2:= eval(f"ops.{nodeResNameDict[resType]}({nodeTag})"),tempValue:= tempValue1 + tempValue2,
+                      nodeDict['node_' + resType + '_' + str(nodeTag)].append(tempValue)] for eachkey in nodeKeys]
+                    ########################################
+                    for eachkey in nodeKeys:
+                        resType= eachkey.split("_")[1]
+                        nodeTag= eachkey.split("_")[2]
+                        saveValueList= nodeDict['node_' + resType + '_' + str(nodeTag)]
+                        saveName = f"staticResponse_node/node_{resType}_{nodeTag}"
+                        numArgs=len(saveValueList[0])-1
+                        headNameList = ["pseudotime"]
+                        for i2 in range(numArgs):
+                            headNameList.append(f"value_{i2 + 1}")
+                        saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                        nodeDict['node_' + resType + '_' + str(nodeTag)]=[]
+                #######################################################################################################
+                #######################################################################################################
+                if trussEleResponseDict:
+                    eleKeys = trussEleResponseDict.keys()
+                    eleResNameDict = {'axialForce': 'basicForce', 'axialDeform': 'basicDeformation'}
+                    # for eachkey in eleKeys:
+                    #     resType= eachkey.split("_")[1]
+                    #     eleTag= eachkey.split("_")[2]
+                    #     tempValue1 = [round(tCurrent, 4)]
+                    #     tempValue2 = [eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]")]
+                    #     tempValue= tempValue1 + tempValue2
+                    #     trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)].append(tempValue)
+                    [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],tempValue1:= [round(tCurrent, 4)],
+                      tempValue2:= [eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]")],tempValue:= tempValue1 + tempValue2,
+                      trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)].append(tempValue)] for eachkey in eleKeys]
+                    ########################################################################################################
+                    for eachkey in eleKeys:
+                        resType= eachkey.split("_")[1]
+                        eleTag= eachkey.split("_")[2]
+                        saveValueList= trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)]
+                        saveName = f"staticResponse_element/trussEle_{resType}_{eleTag}"
+                        numArgs = len(saveValueList[0]) - 1
+                        headNameList = ["pseudotime"]
+                        for i2 in range(numArgs):
+                            headNameList.append(f"value_{i2 + 1}")
+                        saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                        trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)] = []
+                ########################################################################################################
+                ########################################################################################################
+                if zeroEleResponseDict:
+                    eleKeys = zeroEleResponseDict.keys()
+                    # for eachkey in eleKeys:
+                    #     resType= eachkey.split("_")[1]
+                    #     eleTag= eachkey.split("_")[2]
+                    #     tempValue1 = [round(tCurrent, 4)]
+                    #     tempValue2= eval(f"ops.eleResponse({eleTag},'{resType}')")
+                    #     tempValue= [tempValue1 + tempValue2] + [zeroEleDirectionDict[eachkey]]
+                    #     zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)].append(tempValue)
+                    [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],tempValue1:= [round(tCurrent, 4)],
+                      tempValue2:= eval(f"ops.eleResponse({eleTag},'{resType}')"),
+                      tempValue:= [tempValue1 + tempValue2] + [zeroEleDirectionDict[eachkey]],
+                      zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)].append(tempValue)
+                      ] for eachkey in eleKeys]
+                    ################################################
+                    for eachkey in eleKeys:
+                        resType= eachkey.split("_")[1]
+                        eleTag= eachkey.split("_")[2]
+                        saveValueList= [zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)][0][0]]
+                        dirList= zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)][0][1]
+                        saveName = f"staticResponse_element/zeroEle_{resType}_{eleTag}"
+                        numArgs=len(saveValueList[0])-1
+                        headNameList = ["pseudotime"]
+                        for i2 in range(numArgs):
+                            headNameList.append(f"value_{i2 + 1}")
+                        saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList,dirList)
+                        zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)]=[]
+                ########################################################################################################
+                ########################################################################################################
+                if nonEleSectResponsesDict:
+                    eleKeys = nonEleSectResponsesDict.keys()
+                    for eachkey in eleKeys:
+                        resType= eachkey.split("_")[1]
+                        eleTag= eachkey.split("_")[2]
+                        tempValue1 = [round(tCurrent, 4)]
+                        tempValue = tempValue1 + [eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},1)"),
+                            eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},2)"),
+                            eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},3)"),
+                            eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},4)")]
+                        nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)].append(tempValue)
+                    ##################################################
+                    for eachkey in eleKeys:
+                        resType= eachkey.split("_")[1]
+                        eleTag= eachkey.split("_")[2]
+                        saveValueList= nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)]
+                        saveName = f"staticResponse_element/nonEleSection_{resType}_{eleTag}"
+                        numArgs = len(saveValueList[0]) - 1
+                        headNameList = ["pseudotime"]
+                        for i2 in range(numArgs):
+                            headNameList.append(f"value_{i2 + 1}")
+                        saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                        nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)] = []
+                ############################################################################################################
+                ############################################################################################################
+                if nonZeroEleResponsesDict:
+                    eleKeys = nonZeroEleResponsesDict.keys()
+                    for eachkey in eleKeys:
+                        resType= eachkey.split("_")[1]
+                        eleTag= eachkey.split("_")[2]
+                        tempValue1 = [round(tCurrent, 4)]
+                        tempValue2= eval(f"ops.eleResponse({eleTag},'{resType}')")
+                        tempValue= tempValue1 + tempValue2
+                        nonZeroEleResponsesDict[eachkey].append(tempValue)
+                    #########################################
+                    for eachkey in eleKeys:
+                        resType= eachkey.split("_")[1]
+                        eleTag= eachkey.split("_")[2]
+                        saveValueList= nonZeroEleResponsesDict[eachkey]
+                        saveName = f"staticResponse_element/nonZeroEle_{resType}_{eleTag}"
+                        numArgs=len(saveValueList[0])-1
+                        headNameList = ["pseudotime"]
+                        for i2 in range(numArgs):
+                            headNameList.append(f"value_{i2 + 1}")
+                        saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                        nonZeroEleResponsesDict[eachkey]=[]
+            ############################################################################################################
+            ############################################################################################################
+            ops.loadConst('-time', 0.0)  ##-在后续分析步考虑重力作用(将重力视常荷载),并将拟时间置0
+            ############################################################################################################
+        if f is not None:
+            f.close()
+
     ####################################################################################################################
     def integration_analysisModal(self,numModes=10):
         """
@@ -1967,25 +2207,74 @@ class OpenSeesPyX():
         numModes(int)-number of eigenvalues required
         ----------------------------------------------------------------------------------------------------------------
         """
-        tipsString='modal'
-        eigenValues = ops.eigen(numModes)
-        allNodesTag=ops.getNodeTags()
-        self.modalNameList.append(tipsString+'_mode')
-        [[saveList:= [],[[nodeEigenValue:= ops.nodeEigenvector(eachNode, int(eachMode + 1)),
-                          saveList.append([eachNode] + nodeEigenValue)] for eachNode in allNodesTag],
-          self.saveInstance.saveModes(modesName=tipsString+'_mode'+'_'+str(eachMode+1), modesList=saveList)]
-         for eachMode in range(numModes)]
+        ################################################################################################################
+        def saveDataIntoOpenedDB(f,dataName,resultsList,headNameList,operationIndexStr='replace'):
+            """
+            Save results to database, resultsList=[[result0_0,result0_1,],[],...]
+            headNameList=[headName_0,headName_1,...]
+            dataName(str)
+            operationIndexStr='replace' or 'append' 'replace'
+            """
+            if len(resultsList) > 0:
+                list0 = resultsList[0]
+                saveTypeList = []
+                typeDict = {"int": "np.int32", "float": "np.float32", "str": "h5py.string_dtype(encoding='utf-8')"}
+                saveTypeList = [typeDict["int"] if isinstance(eachValue, (int, np.int64, np.uint64)) else
+                                typeDict["float"] if isinstance(eachValue, (float, np.float64)) else
+                                typeDict["str"] if isinstance(eachValue, str) else None for eachValue in list0]
 
-        savePeridList=[]
-        [[periodT:= 2.0 * 3.1415926 / float(eigenValues[i1] ** 0.5),savePeridList.append([i1+1,periodT])] for i1 in range(numModes)]
-        self.saveInstance.savePeriod(periodList=savePeridList)
+                dtypeStr = "np.dtype(["
+                dtypeStr += ''.join([f"('{headNameList[i1]}',{saveTypeList[i1]})," for i1 in range(len(list0) - 1)])
+                dtypeStr += f"('{headNameList[-1]}',{saveTypeList[-1]})])"
+                dtype = eval(dtypeStr)
+                structured_data = np.zeros(len(resultsList), dtype=dtype)
+                for i2 in range(len(headNameList)):
+                    structured_data[headNameList[i2]] = [each[i2] for each in resultsList]
+                #################################################################################
+                dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype, chunks=True,
+                                           compression='gzip', compression_opts=9, shuffle=True)
+                new_size = len(resultsList)
+                dataset.resize(new_size, axis=0)
+                dataset[0:new_size] = structured_data
+            f.flush()
+        ################################################################################################################
+        dbPath=self.saveInstance._dbPath
+        f=h5py.File(dbPath, 'a')
+        allNodesTag = ops.getNodeTags()
+        eigenValues = ops.eigen(numModes)
+        ################################################################################################################
+        for eachMode in range(numModes):
+            saveList= []
+            for eachNode in allNodesTag:
+                nodeEigenValue= ops.nodeEigenvector(eachNode, int(eachMode + 1))
+                saveList.append([eachNode] + nodeEigenValue)
+            ########################
+            dofNum=len(saveList[0])-1
+            saveName = f"modalInfo/modal_mode_{eachMode+1}"
+            saveValueList=saveList
+            headNameList=["nodeTag"]
+            for i2 in range(dofNum):
+                headNameList.append(f"dof_{i2+1}")
+            operationIndexStr = 'replace'
+            saveDataIntoOpenedDB(f,saveName,saveValueList,headNameList,operationIndexStr)
+        ########################
+        savePeridList = []
+        for i3 in range(numModes):
+            periodT= 2.0 * 3.1415926 / float(eigenValues[i3] ** 0.5)
+            savePeridList.append([i3 + 1, periodT])
+        saveName = f"periodInfo/period"
+        saveValueList =savePeridList
+        headNameList = ["modeNum","period"]
+        saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList, operationIndexStr)
+        ###########################################################################
+        f.close()
+        ################################################################################################################
         if numModes>=10:
             for i2 in range(10):
                 print(str(i2 + 1) + ' th period is: ' + str(savePeridList[i2]) + ' second')
         else:
             for i2 in range(numModes):
                 print(str(i2 + 1) + ' th period is: ' + str(savePeridList[i2]) + ' second')
-
     ####################################################################################################################
     def integration_analysisModalProperties(self,numEigen,pflag=1,outname=None):
         """
@@ -2270,10 +2559,75 @@ class OpenSeesPyX():
         # ops.algorithm('KrylovNewton')
         # ops.integrator('Newmark', 0.5, 0.25)
         # ops.analysis('Transient')
-        ######################################################
-        #######################################################
+        ################################################################################################################
+        ################################################################################################################
+        def saveDataIntoOpenedDB(f,dataName,resultsList,headNameList,dirList=None):
+            """
+            Save results to database, resultsList=[[result0_0,result0_1,],[],...]
+            headNameList=[headName_0,headName_1,...]
+            dataName(str)
+            operationIndexStr='replace' or 'append' 'replace'
+            """
+            # if len(resultsList) > 0:
+            #     # t1=time.time()
+            #     list0 = resultsList[0]
+            #     saveTypeList = []
+            #     typeDict = {"int": "np.int32", "float": "np.float32", "str": "h5py.string_dtype(encoding='utf-8')"}
+            #     saveTypeList = [typeDict["int"] if isinstance(eachValue, (int, np.int64, np.uint64)) else
+            #                     typeDict["float"] if isinstance(eachValue, (float, np.float64)) else
+            #                     typeDict["str"] if isinstance(eachValue, str) else None for eachValue in list0]
+            #
+            #     dtypeStr = "np.dtype(["
+            #     dtypeStr += ''.join([f"('{headNameList[i1]}',{saveTypeList[i1]})," for i1 in range(len(list0) - 1)])
+            #     dtypeStr += f"('{headNameList[-1]}',{saveTypeList[-1]})])"
+            #     dtype = eval(dtypeStr)
+            #     structured_data = np.zeros(len(resultsList), dtype=dtype)
+            #     for i2 in range(len(headNameList)):
+            #         structured_data[headNameList[i2]] = [each[i2] for each in resultsList]
+            #     ########################################################################################################
+            #     # t2=time.time()
+            #     # print("time1=",t2-t1)
+            #     dataset = f.get(dataName)
+            #     # t3 = time.time()
+            #     if dataset is None:
+            #         dataset = f.create_dataset(dataName, shape=(0,), maxshape=(None,), dtype=dtype, chunks=True,compression=None)
+            #         new_size = len(resultsList)
+            #         dataset.resize(new_size, axis=0)
+            #         dataset[0:new_size] = structured_data
+            #         if dirList is not None:
+            #             dataset.attrs['dirList'] =dirList
+            #     else:
+            #         original_size = dataset.shape[0]
+            #         new_size = original_size + len(resultsList)
+            #         dataset.resize(new_size, axis=0)
+            #         dataset[original_size:new_size] = structured_data
+            #     # t4 = time.time()
+            #     # print("time2=", t4 - t3)
+            ##################################################
+            if len(resultsList) > 0:
+                arr=np.array(resultsList).astype(np.float32,order='C')
+                dataset = f.get(dataName)
+                n_cols=len(resultsList[0])
+                if dataset is None:
+                    dataset = f.create_dataset(dataName,shape=(0, n_cols),maxshape=(None, n_cols),dtype=np.float32)
+                    dataset.resize(len(resultsList), axis=0)
+                    dataset[0:dataset.shape[0], :] = arr
+                    if dirList is not None:
+                        dataset.attrs['dirList'] =dirList
+                else:
+                    original_size = dataset.shape[0]
+                    new_size = original_size + len(resultsList)
+                    dataset.resize(new_size, axis=0)
+                    dataset[original_size:new_size] =arr
+        ################################################################################################################
+        ################################################################################################################
         writeInterNum=200 ###---每200时间步将结果写入数据库一次
+        f=None
         if recordList!=None:
+            ######################################################################
+            dbPath = self.saveInstance._dbPath
+            f = h5py.File(dbPath, 'a', libver='latest')
+            ######################################################################
             nodeDict={}
             trussEleResponseDict={}
             zeroEleResponseDict={}
@@ -2298,9 +2652,9 @@ class OpenSeesPyX():
                     zeroEleDirectionDict = {**zeroEleDirectionDict, **eleDirectDict}  ##Merge two dicts
                 elif each[0]=='nonEleSection':
                     responseType,sectNum,eleTags=each[1],each[2],each[3]
-                    eleItemDict = {('nonEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
+                    eleItemDict = {('nonEleSection_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     nonEleSectResponsesDict = {**nonEleSectResponsesDict, **eleItemDict}  ##Merge two dicts
-                    sectNumDict = {('nonEle_' + responseType + '_' + str(eachEle)): sectNum for eachEle in eleTags}
+                    sectNumDict = {('nonEleSection_' + responseType + '_' + str(eachEle)): sectNum for eachEle in eleTags}
                     nonEleSectNumberDict = {**nonEleSectNumberDict, **sectNumDict}  ##Merge two dicts
                 elif each[0]=='nonZeroEle':
                     responseType,eleTags = each[1], each[2]
@@ -2311,7 +2665,7 @@ class OpenSeesPyX():
         startTime = time.perf_counter()
         tCurrent = ops.getTime()
         tFinal = currentLength * currentDt
-        timeList = [tCurrent]
+        timeList = []
         maxNumIter=1000
         tol=1.0e-4
         deltaTList=[]
@@ -2342,88 +2696,215 @@ class OpenSeesPyX():
                 timeList.append(tCurrent)
                 endTime = time.perf_counter()
                 realTime = endTime - startTime
-                ##################################################
-                ####################---recorderProcess---###########
+                ########################################################################################################
+                ####################---recorderProcess---###############################################################
                 if recordList!=None:
                     if nodeDict:
                         nodeKeys=nodeDict.keys()
                         nodeResNameDict={'disp':'nodeDisp','vel':'nodeVel','accel':'nodeAccel','reaction':'nodeReaction'}
                         if (len(nodeDict[list(nodeKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
-                            [[resType:=eachkey.split("_")[1],nodeTag:=eachkey.split("_")[2],
-                              saveValueList:=nodeDict['node_'+resType+'_'+str(nodeTag)],
-                              self.saveInstance.saveNodeTimeHistory(nodeSaveName=eachkey, nodeHistoryList=saveValueList)
-                              ] for eachkey in nodeKeys]
+                            # for eachkey in nodeKeys:
+                            #     resType= eachkey.split("_")[1]
+                            #     nodeTag= eachkey.split("_")[2]
+                            #     saveValueList= nodeDict['node_' + resType + '_' + str(nodeTag)]
+                            #     saveName = f"timeHistoryResponse_node/node_{resType}_{nodeTag}"
+                            #     # saveName = f"modalInfo/modal_mode_{eachMode + 1}"
+                            #     numArgs=len(saveValueList[0])-1
+                            #     headNameList = ["time"]
+                            #     for i2 in range(numArgs):
+                            #         headNameList.append(f"value_{i2 + 1}")
+                            #     saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                            [[resType:= eachkey.split("_")[1],nodeTag:= eachkey.split("_")[2],
+                              saveValueList:= nodeDict['node_' + resType + '_' + str(nodeTag)],
+                              saveName:= f"timeHistoryResponse_node/node_{resType}_{nodeTag}",
+                              numArgs:=len(saveValueList[0])-1,headNameList:= ["time"],
+                              [headNameList.append(f"value_{i2 + 1}") for i2 in range(numArgs)],operationIndexStr:= 'append',
+                            saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)] for eachkey in nodeKeys]
+                            ############################################################################################
+                            f.flush()
                             for eachkey in nodeKeys:
-                                nodeDict[eachkey] = []
-
-                        [[resType:=eachkey.split('_')[1],nodeTag:=eachkey.split('_')[2],tempValue1:=[round(tCurrent,4)],
-                          tempValue2:=eval(f"ops.{nodeResNameDict[resType]}({nodeTag})"),
-                            tempValue3:=[round(tempValue2[i1],6) for i1 in range(3)],
-                          tempValue:=tempValue1+tempValue3,
-                          nodeDict['node_' + resType + '_' + str(nodeTag)].append(tempValue)] for eachkey in nodeKeys] ##海象运算符加列表解析
+                                nodeDict[eachkey] = [] #### return to null list
+                        ################################################################################################
+                        # for eachkey in nodeKeys:
+                        #     resType= eachkey.split('_')[1]
+                        #     nodeTag= eachkey.split('_')[2]
+                        #     tempValue1= [round(tCurrent, 4)]
+                        #     tempValue2= eval(f"ops.{nodeResNameDict[resType]}({nodeTag})")
+                        #     tempValue3= [tempValue2[i1] for i1 in range(len(tempValue2))]
+                        #     tempValue= tempValue1 + tempValue3
+                        #     nodeDict['node_' + resType + '_' + str(nodeTag)].append(tempValue)
+                        [[resType:= eachkey.split('_')[1],nodeTag:= eachkey.split('_')[2],tempValue1:= [round(tCurrent, 4)],
+                          tempValue2:= eval(f"ops.{nodeResNameDict[resType]}({nodeTag})"),
+                          tempValue3:= [tempValue2[i1] for i1 in range(len(tempValue2))],tempValue:= tempValue1 + tempValue3,
+                          nodeDict['node_' + resType + '_' + str(nodeTag)].append(tempValue)] for eachkey in nodeKeys]
+                    ###################################################################################################
+                    ###################################################################################################
+                    ###################################################################################################
                     if trussEleResponseDict:
                         eleKeys = trussEleResponseDict.keys()
                         eleResNameDict = {'axialForce': 'basicForce','axialDeform':'basicDeformation'}
                         if (len(trussEleResponseDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
-                            [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
-                              saveValueList:=trussEleResponseDict['trussEle_'+resType+'_'+str(eleTag)],
-                              self.saveInstance.saveTrussEleResponseTimeHistory(eleSaveName=eachkey,
-                              eleHistoryList=saveValueList)] for eachkey in eleKeys]
+                            # for eachkey in eleKeys:
+                            #     resType= eachkey.split("_")[1]
+                            #     eleTag= eachkey.split("_")[2]
+                            #     saveValueList= trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)]
+                            #     saveName = f"timeHistoryResponse_element/trussEle_{resType}_{eleTag}"
+                            #     numArgs=len(saveValueList[0])-1
+                            #     headNameList = ["time"]
+                            #     for i2 in range(numArgs):
+                            #         headNameList.append(f"value_{i2 + 1}")
+                            #     saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                            [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],
+                              saveValueList:= trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)],
+                              saveName:= f"timeHistoryResponse_element/trussEle_{resType}_{eleTag}",
+                              numArgs:=len(saveValueList[0])-1,headNameList:= ["time"],
+                              [headNameList.append(f"value_{i2 + 1}") for i2 in range(numArgs)],
+                              operationIndexStr:= 'append',
+                              saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)]
+                             for eachkey in eleKeys]
+                            #############################################
+                            f.flush()
                             for eachkey in eleKeys:
                                 trussEleResponseDict[eachkey] = []
-                        [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],tempValue1:=[round(tCurrent,4)],
-                          tempValue2:=[round(eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]"),6)],
-                          tempValue:=tempValue1+tempValue2,
-                          trussEleResponseDict['trussEle_'+resType+'_'+str(eleTag)].append(tempValue)] for eachkey in eleKeys]
+                            #############################################
+                        # for eachkey in eleKeys:
+                        #     resType= eachkey.split("_")[1]
+                        #     eleTag= eachkey.split("_")[2]
+                        #     tempValue1= [round(tCurrent, 4)]
+                        #     tempValue2= [eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]")]
+                        #     tempValue= tempValue1 + tempValue2
+                        #     trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)].append(tempValue)
+                        [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],tempValue1:= [round(tCurrent, 4)],
+                          tempValue2:= [eval(f"ops.{eleResNameDict[resType]}({eleTag})[0]")],tempValue:= tempValue1 + tempValue2,
+                        trussEleResponseDict['trussEle_' + resType + '_' + str(eleTag)].append(tempValue)] for eachkey in eleKeys]
+                    #####################################################################################################
+                    ###################################################################################################
+                    ###################################################################################################
                     if zeroEleResponseDict:
                         eleKeys = zeroEleResponseDict.keys()
                         if (len(zeroEleResponseDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
-                            [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
-                              saveValueListSS:=zeroEleResponseDict['zeroEle_'+resType+'_'+str(eleTag)],
+                            # for eachkey in eleKeys:
+                            #     resType= eachkey.split("_")[1]
+                            #     eleTag= eachkey.split("_")[2]
+                            #     saveValueListSS= zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)]
+                            #     dirValueList= saveValueListSS[0][1]
+                            #     saveName = f"timeHistoryResponse_element/zeroEle_{resType}_{eleTag}"
+                            #     saveValueList=[each[0] for each in saveValueListSS]
+                            #     numArgs=len(saveValueList[0])-1
+                            #     headNameList = ["time"]
+                            #     for i2 in range(numArgs):
+                            #         headNameList.append(f"value_{i2 + 1}")
+                            #     saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList,dirValueList)
+                            [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],
+                              saveValueListSS:= zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)],
+                              dirValueList:= saveValueListSS[0][1],
+                              saveName:= f"timeHistoryResponse_element/zeroEle_{resType}_{eleTag}",
                               saveValueList:=[each[0] for each in saveValueListSS],
-                              dirValueList:=saveValueListSS[0][1],
-                              self.saveInstance.saveZeroEleResponseTimeHistory(eleSaveName=eachkey,
-                              eleHistoryList=saveValueList,dirList=dirValueList)] for eachkey in eleKeys]
+                              numArgs:=len(saveValueList[0])-1,headNameList:= ["time"],
+                              [headNameList.append(f"value_{i2 + 1}") for i2 in range(numArgs)],
+                              saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList,dirValueList)] for eachkey in eleKeys]
+                            #################################################
+                            f.flush()
                             for eachkey in eleKeys:
                                 zeroEleResponseDict[eachkey] = []
-                        [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],tempValue1:=[round(tCurrent,4)],
-                          tempValue2:=eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                          tempValue3:=[round(each,6) for each in tempValue2],
-                          tempValue:= [tempValue1 + tempValue3]+[zeroEleDirectionDict[eachkey]],
-                          zeroEleResponseDict['zeroEle_'+resType+'_'+str(eleTag)].append(tempValue)] for eachkey in eleKeys]##海象操作符
-                        # print(zeroEleResponseDict)
+                            ################################################
+                        # for eachkey in eleKeys:
+                        #     resType= eachkey.split("_")[1]
+                        #     eleTag= eachkey.split("_")[2]
+                        #     tempValue1= [round(tCurrent, 4)]
+                        #     tempValue2= eval(f"ops.eleResponse({eleTag},'{resType}')")
+                        #     tempValue3= tempValue2
+                        #     tempValue = [tempValue1 + tempValue3] + [zeroEleDirectionDict[eachkey]]
+                        #     zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)].append(tempValue)
+                        [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],tempValue1:= [round(tCurrent, 4)],
+                          tempValue2:= eval(f"ops.eleResponse({eleTag},'{resType}')"),tempValue3:= tempValue2,
+                          tempValue:= [tempValue1 + tempValue3] + [zeroEleDirectionDict[eachkey]],
+                          zeroEleResponseDict['zeroEle_' + resType + '_' + str(eleTag)].append(tempValue)] for eachkey in eleKeys]
+                    ###################################################################################################
+                    ###################################################################################################
+                    ###################################################################################################
                     if nonEleSectResponsesDict:
                         eleKeys = nonEleSectResponsesDict.keys()
                         digitNumDict = {'sectionForce':6,'sectionDeformation':10}
                         if (len(nonEleSectResponsesDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
-                            [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
-                              saveValueList:=nonEleSectResponsesDict['nonEle_'+resType+'_'+str(eleTag)],
-                              self.saveInstance.saveNonEleSectResponseTimeHistory(eleSaveName=eachkey,
-                            eleHistoryList=saveValueList)] for eachkey in eleKeys]
+                            # for eachkey in eleKeys:
+                            #     resType= eachkey.split("_")[1]
+                            #     eleTag= eachkey.split("_")[2]
+                            #     saveValueList= nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)]
+                            #     saveName = f"timeHistoryResponse_element/nonEleSection_{resType}_{eleTag}"
+                            #     numArgs=len(saveValueList[0])-1
+                            #     headNameList = ["time"]
+                            #     for i2 in range(numArgs):
+                            #         headNameList.append(f"value_{i2 + 1}")
+                            #     saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                            [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],
+                              saveValueList:= nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)],
+                              saveName:= f"timeHistoryResponse_element/nonEleSection_{resType}_{eleTag}",
+                              numArgs:=len(saveValueList[0])-1,headNameList:= ["time"],
+                              [headNameList.append(f"value_{i2 + 1}") for i2 in range(numArgs)],
+                              saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)] for eachkey in eleKeys]
+
+                            ###########################################################################
+                            f.flush()
                             for eachkey in eleKeys:
                                 nonEleSectResponsesDict[eachkey] = []
-                        [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
-                          tempValue := [round(tCurrent, 4)] + [round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},1)"),
-                                                                     digitNumDict[resType]),
-                            round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},2)"),digitNumDict[resType]),
-                            round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},3)"),digitNumDict[resType]),
-                            round(eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},4)")),digitNumDict[resType]],
-                          nonEleSectResponsesDict['nonEle_' + resType + '_' + str(eleTag)].append(tempValue)] for eachkey in eleKeys]
+                            ########################################################################
+                        # for eachkey in eleKeys:
+                        #     resType= eachkey.split("_")[1]
+                        #     eleTag= eachkey.split("_")[2]
+                        #     tempValue= [round(tCurrent, 4)] + [
+                        #         eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},1)"),
+                        #         eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},2)"),
+                        #         eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},3)"),
+                        #         eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},4)")]
+                        #     nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)].append(tempValue)
+                        [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],tempValue:= [round(tCurrent, 4)]
+                            + [eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},1)"),
+                                eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},2)"),
+                                eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},3)"),
+                                eval(f"ops.{resType}({eleTag},{nonEleSectNumberDict[eachkey]},4)")],
+                          nonEleSectResponsesDict['nonEleSection_' + resType + '_' + str(eleTag)].append(tempValue)] for eachkey in eleKeys]
+                    ###################################################################################################
+                    ###################################################################################################
+                    ###################################################################################################
                     if nonZeroEleResponsesDict:
                         eleKeys = nonZeroEleResponsesDict.keys()
                         if (len(nonZeroEleResponsesDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
-                            [[resType:=eachkey.split("_")[1],eleTag:=eachkey.split("_")[2],
-                              saveValueList:=nonZeroEleResponsesDict[eachkey],
-                              self.saveInstance.saveNonZeroEleResponseTimeHistory(eleSaveName=eachkey,
-                            eleHistoryList=saveValueList)] for eachkey in eleKeys]
+                            # for eachkey in eleKeys:
+                            #     resType= eachkey.split("_")[1]
+                            #     eleTag= eachkey.split("_")[2]
+                            #     saveValueList= nonZeroEleResponsesDict[eachkey]
+                            #     saveName = f"timeHistoryResponse_element/nonZeroEle_{resType}_{eleTag}"
+                            #     numArgs=len(saveValueList[0])-1
+                            #     headNameList = ["time"]
+                            #     for i2 in range(numArgs):
+                            #         headNameList.append(f"value_{i2 + 1}")
+                            #     saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                            [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],
+                              saveValueList:= nonZeroEleResponsesDict[eachkey],
+                              saveName:= f"timeHistoryResponse_element/nonZeroEle_{resType}_{eleTag}",
+                              numArgs:=len(saveValueList[0])-1,headNameList:= ["time"],
+                              [headNameList.append(f"value_{i2 + 1}") for i2 in range(numArgs)],
+                              [saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)]] for eachkey in eleKeys]
+                            #####################################################
+                            f.flush()
                             for eachkey in eleKeys:
                                 nonZeroEleResponsesDict[eachkey] = []
-                        [[resType := eachkey.split("_")[1], eleTag := eachkey.split("_")[2],tempValue1:=[round(tCurrent, 4)],
-                          tempValue2:=eval(f"ops.eleResponse({eleTag},'{resType}')"),
-                        tempValue3:=[round(each,3) for each in tempValue2],tempValue := tempValue1 + tempValue3,
-                         nonZeroEleResponsesDict[eachkey].append(tempValue)] for eachkey in eleKeys]
-                ###################################
-                ###################################
+                            ######################################################
+                        # for eachkey in eleKeys:
+                        #     resType= eachkey.split("_")[1]
+                        #     eleTag= eachkey.split("_")[2]
+                        #     tempValue1= [round(tCurrent, 4)]
+                        #     tempValue2= eval(f"ops.eleResponse({eleTag},'{resType}')")
+                        #     tempValue3= tempValue2
+                        #     tempValue= tempValue1 + tempValue3
+                        #     nonZeroEleResponsesDict[eachkey].append(tempValue)
+                        [[resType:= eachkey.split("_")[1],eleTag:= eachkey.split("_")[2],tempValue1:= [round(tCurrent, 4)],
+                          tempValue2:= eval(f"ops.eleResponse({eleTag},'{resType}')"),tempValue3:= tempValue2,
+                          tempValue:= tempValue1 + tempValue3,nonZeroEleResponsesDict[eachkey].append(tempValue)] for eachkey in eleKeys]
+                ########################################################################################################
+                ########################################################################################################
+                ########################################################################################################
                 print('KrylovNewton',f'ground motion={waveNumber}','tol=',tol,'maxNumIter=',maxNumIter, 'totalTime=',
                       tFinal, 'tCurrent=',"{:.6f}".format(tCurrent),'time cost=', "{:.1f}".format(realTime), 'second')
             else:
@@ -2433,6 +2914,9 @@ class OpenSeesPyX():
                 else:
                     print(f"ground moition {waveNumber}"," failed!")
                     break
+            ############################################################################################################
+        if f is not None:
+            f.close()
 ########################################################################################################################
 if __name__ == "__main__":
     pass
