@@ -1,4 +1,4 @@
-# SAPStructure (Version 0.5.0)
+# SAPStructure (Version 0.5.1)
 Seismic analysis platform for structures   
 ##########################################################################    
 Author: Junjun Guo([HomePage](https://github.com/Junjun1guo))    
