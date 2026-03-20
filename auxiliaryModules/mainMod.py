@@ -1374,7 +1374,14 @@ class HystereticCurveAnalysis():
         """
         self.instance.skeletonCurve(saveData,saveFig)
 
-    def plotLoop(self,loopNumber,saveData=False,saveFig=False,dottedLine=True):
+    def skeletonCurve_doubleDirection(self):
+        """
+        Get and plot the skeleton curve of double direction hysteretic data
+        ------------------------------------------
+        """
+        return self.instance.skeletonCurve_doubleDirection()
+
+    def plotLoop_singleDirection(self,loopNumber,saveData=False,saveFig=False,dottedLine=True):
         """
 		Plot each hysteretic loop
         ------------------------------------------
@@ -1383,7 +1390,44 @@ class HystereticCurveAnalysis():
         saveData(bool)-Whether save the hysteretic loop data, default value is False
         saveFig(bool)-Whether save the hysteretic loop figure, default value is False
         """
-        self.instance.plotLoop(loopNumber,saveData,saveFig)
+        self.instance.plotLoop_singleDirection(loopNumber,saveData,saveFig)
+
+    def plotLoop_doubleDirection(self, loopNumber, saveData=False, saveFig=False, dottedLine=True, zero_tol=None,
+                                 min_points=50):
+        """
+        Plot each hysteretic loop
+        ------------------------------------------
+        Inputs:
+        loopNumber(int)-The hysteretic loop number
+        saveData(bool)-Whether save the hysteretic loop data, default value is False
+        saveFig(bool)-Whether save the hysteretic loop figure, default value is False
+        zero_tol(float)-The zero tolerance, default value is None
+        min_points(int)-minimum data points per half-cycle
+        """
+        self.instance.plotLoop_doubleDirection(loopNumber, saveData, saveFig,dottedLine,zero_tol,min_points)
+
+    def yAxisDataTranslation(self, startX: float, endX: float):
+        """
+        By adjusting the y-direction data of the initial curve to make the data symmetric within the starting interval.
+        ----------------------------------------------------------------------------------------------------------------
+        Inputs:
+                startX(float)-The start value of the range
+                endX(float)-The end value of the range
+        """
+        self.instance.yAxisDataTranslation(startX,endX)
+
+    def eliminateInitialEffect(self, startX: float, endX: float):
+        """
+        By eliminating the initial interval effects, such as friction influence, the data within the initial interval
+        is essentially zeroed out.
+        ----------------------------------------------------------------------------------------------------------------
+        Inputs:
+                startX(float)-The start value of the range
+                endX(float)-The end value of the range
+        """
+        self.instance.eliminateInitialEffect(startX,endX)
+
+
 ########################################################################################################################
 ########################################################################################################################
 class DisplacementHistory():
