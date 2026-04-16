@@ -34,9 +34,9 @@ hystereticCurveInstance=HystereticCurveAnalysis(xData,yData)
 hystereticCurveInstance.yAxisDataTranslation(startX=-10,endX=10)
 hystereticCurveInstance.plotHystereticCurve()
 ###############################################
-# hystereticCurveInstance.plotLoop_doubleDirection(loopNumber=1)
+hystereticCurveInstance.plotLoop_doubleDirection(loopNumber=30)
 ###############################################
-posValue,negValue=hystereticCurveInstance.skeletonCurve_doubleDirection()
+# posValue,negValue=hystereticCurveInstance.skeletonCurve_doubleDirection()
 ########################################################################################################################
 
 

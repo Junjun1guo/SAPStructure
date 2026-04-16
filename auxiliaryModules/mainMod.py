@@ -1353,7 +1353,8 @@ class HystereticCurveAnalysis():
         from .hystereticCurveAnalysis.hystereticCurveAnalysis import HystereticCurveAnalysis
         self.instance=HystereticCurveAnalysis(xDataList,yDataList)
 
-    def plotHystereticCurve(self,saveFig=False,xlabel="x",ylabel='y',title='Hysteretic curve',multiColors=False):
+    def plotHystereticCurve(self,saveFig=False,xlabel="x",ylabel='y',title='Hysteretic curve',multiColors=False,
+                            ySingle=True):
         """
         Plot the original hysteretic curve
         ------------------------------------------
@@ -1361,8 +1362,9 @@ class HystereticCurveAnalysis():
         saveFig(bool)-Save the plot to eps figure, default not saved
         xDataList,yDataList(list)-The x and y values of the hysteretic curve data
         multiColors(bool)-Whether distinguish different loops with different colors, default value is False
+        ySingle(bool)-single direction y value or not
         """
-        self.instance.plotHystereticCurve(saveFig,xlabel,ylabel,title,multiColors)
+        self.instance.plotHystereticCurve(saveFig,xlabel,ylabel,title,multiColors,ySingle)
 
     def skeletonCurve(self,saveData=False,saveFig=False):
         """

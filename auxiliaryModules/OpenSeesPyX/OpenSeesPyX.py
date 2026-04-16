@@ -222,6 +222,68 @@ class OpenSeesPyX():
                             "fpk1860": [77, 1.95E+08, 0.3, 1.170E-05, 75000000,1860000,2140000]}
         return tendonMatProDict[tendonTag]
     ####################################################################################################################
+    def auxiliary_concreteUltimateStrength_TB10092_2017(self,concreteTag="C25"):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        ---the concrete ultimate strength based on Code for Design of Concrete Structures of Railway Bridge and Culvert
+        (TB 10092-2017)---
+        Input:
+            concrete Tag(str), one of the grade "C25","C30","C35","C40","C45","C50","C55" or "C60"
+        OutPut:
+            ultimate strength (axial compressive, axial tensile) (KPa)
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        concreteUltimateStrengthDict = {"C25": [17.0*1000,2.0*1000],"C30": [20.0*1000,2.2*1000],
+                                        "C35": [23.5*1000,2.5*1000],"C40": [27.0*1000,2.7*1000],
+                                        "C45": [30.0*1000,2.9*1000],"C50": [33.5*1000,3.1*1000],
+                                        "C55": [37.0*1000,3.3*1000],"C60": [40.0*1000,3.5*1000]}
+        return concreteUltimateStrengthDict[concreteTag]
+    ####################################################################################################################
+    def auxiliary_concreteEGPoissonRation_TB10092_2017(self,concreteTag="C25"):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        ---the concrete elastic modulus, shear modulus and Possion ration based on Code for Design of Concrete Structures
+        of Railway Bridge and Culvert(TB 10092-2017)---
+        Input:
+            concrete Tag(str), one of the grade "C25","C30","C35","C40","C45","C50","C55" or "C60"
+        OutPut:
+            [elasticModulus(kPa), shearModulus(kPa), PossionRation]
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        concreteEGPDict = {"C25": [3.0*10**7,0.43*3.0*10**7,0.2],"C30": [3.2*10**7,0.43*3.2*10**7,0.2],
+                           "C35": [3.3*10**7,0.43*3.3*10**7,0.2],"C40": [3.4*10**7,0.43*3.4*10**7,0.2],
+                           "C45": [3.45*10**7,0.43*3.45*10**7,0.2],"C50": [3.55*10**7,0.43*3.55*10**7,0.2],
+                           "C55": [3.6*10**7,0.43*3.6*10**7,0.2],"C60": [3.65*10**7,0.43*3.65*10**7,0.2]}
+        return concreteEGPDict[concreteTag]
+    ####################################################################################################################
+    def auxiliary_tendonStandardTensileStrength_TB10092_2017(self,tendonCode="HPB300"):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        ---tendon standard tensile strength based on Code for Design of Concrete Structures of Railway Bridge and
+        Culvert(TB 10092-2017)---
+        Input:
+            tendon code(str), one of the grade "HPB300","HRB400","HRB500","C40","PSB830","PSB980"
+        OutPut:
+            [standardTensileStrength(KPa)]
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        retrunDict = {"HPB300": 300*10**3,"HRB400": 400*10**3,"HRB500": 500*10**3,"PSB830": 830*10**3,"PSB980": 980*10**3}
+        return retrunDict[tendonCode]
+    ####################################################################################################################
+    def auxiliary_steelElasticModulus_TB10092_2017(self,steelCode="wire"):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        ---steel elastic modulus based on Code for Design of Concrete Structures of Railway Bridge andCulvert(TB 10092-2017)---
+        Input:
+            steel code(str), one of the grade "wire","wireStrand","prestressedBar","HPB300","HRB400","HRB500"
+        OutPut:
+            [elasticModulus(KPa)]
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        retrunDict = {"wire":2.05*10**5,"wireStrand":1.95*10**5,"prestressedBar":2.0*10**5,"HPB300":2.1*10**5,
+                      "HRB400":2.0*10**5,"HRB500":2.0*10**5}
+        return retrunDict[steelCode]
+    ####################################################################################################################
     def auxiliary_fiberSectionPlot(self,sectTag, fillFlag=1):
         """
         ----------------------------------------------------------------------------------------------------------------

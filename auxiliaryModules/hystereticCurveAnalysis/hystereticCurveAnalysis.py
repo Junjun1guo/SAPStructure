@@ -11,6 +11,8 @@ import numpy as np
 import os
 import math
 import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['SimHei']  # »ò Microsoft YaHei
+plt.rcParams['axes.unicode_minus'] = False
 import matplotlib
 matplotlib.use('TkAgg')
 import openseespy.opensees as ops
@@ -47,7 +49,8 @@ class HystereticCurveAnalysis():
 		self.loopInfoDict={} ###---loopNum:[startIndex,endIndex]
 		self.tensionOnly=True
 
-	def plotHystereticCurve(self,saveFig=False,xlabel="x",ylabel='y',title='Hysteretic curve',multiColors=False):
+	def plotHystereticCurve(self,saveFig=False,xlabel="x",ylabel='y',title='Hysteretic curve',multiColors=False,
+							ySingle=True):
 		"""
         Plot the original hysteratic curve
         ------------------------------------------
@@ -55,6 +58,7 @@ class HystereticCurveAnalysis():
         saveFig(bool)-Save the plot to eps figure, default not saved
         xDataList,yDataList(list)-The x and y values of the hysteretic curve data
         multiColors(bool)-Whether distinguish different loops with different colors, default value is False
+        ySingle(bool)-whethoer single direction y value or not
 		"""
 		ax=plt.subplot(1,1,1)
 		if not multiColors:
@@ -67,6 +71,9 @@ class HystereticCurveAnalysis():
 				start,end=value
 				plt.plot(self.xValueList[start:end],self.yValueList[start:end],ls='-',lw=1.5)
 			ax.legend(labels=legendList)
+		if ySingle==False:
+			ybond=max(abs(self.yValueList))*1.1
+			plt.ylim([-ybond,ybond])
 		plt.xlabel(f'{xlabel}', fontsize=15)
 		plt.ylabel(f'{ylabel}', fontsize=15)
 		plt.title(f'{title}', fontsize=15)
