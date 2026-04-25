@@ -36,8 +36,8 @@ dispInstance=DisplacementHistory()
 # dispHistory = dispInstance.cyclicOneSideLinearIncrPeak(numCycle=10, numDivide=15, maxDisp=-0.5,
 #                                                                 scaleFactor=2,plotDispHistory=True)
 #######################---cyclicOneSideLinearIncrPeak_nConst displacement history
-dispHistory=dispInstance.cyclicOneSideLinearIncrPeak_nConst(numCycle= 20, numDivide= 100, maxDisp= -0.05,scaleFactor= 1,
-                                                numLocalConst= 1, plotDispHistory= True)
+# dispHistory=dispInstance.cyclicOneSideLinearIncrPeak_nConst(numCycle= 20, numDivide= 100, maxDisp= -0.05,scaleFactor= 1,
+#                                                 numLocalConst= 1, plotDispHistory= True)
 #######################---cyclicTwoSideConstPeak displacement history
 # dispHistory= dispInstance.cyclicTwoSideConstPeak(numCycle= 2, numDivide= 10, maxDisp= 1,scaleFactor= 1.5,plotDispHistory= True)
 #######################---cyclicTwoSideConstPeak displacement history
@@ -57,7 +57,14 @@ materialTestInstance=MaterialTest()
 ########################################################################################################################
 # dispList,forceList=materialTestInstance.uniaixalMaterialTest("uniaxialMaterial('Steel01_Test',1,4000,200000,0.1)",
 #                                                              dispHistory)
-dispList,forceList=materialTestInstance.uniaixalMaterialTest("uniaxialMaterial('Concrete01', 1, -6.0, -0.004, -5.0, -0.014)",
-                                                             dispHistory)
+# dispHistory=dispInstance.monotonicDispHistory(numDivide=100,maxDisp=-0.003,scaleFactor=1,plotDispHistory=True)
+dispHistory=dispInstance.cyclicTwoSideLinearIncrPeak(numCycle=10, numDivide=20, maxDisp=-0.004, scaleFactor=1, plotDispHistory=False)
+frictionCoeff = 0.05  #####-支座摩擦副摩擦系取为0.05
+shearKeyLongK = 1650 / 0.002  ####-取位移2mm发生剪断
+ops.uniaxialMaterial('Elastic', 101, shearKeyLongK)
+ops.uniaxialMaterial('MinMax', 102, 101, '-min', -0.002, '-max', 0.002)  ###-位移超过2mm让剪力键失效
+materialList=[f"uniaxialMaterial('Elastic', 101, {shearKeyLongK})",
+              f"uniaxialMaterial('MinMax', 102, 101, '-min', -0.002, '-max', 0.002) "]
+materialTestInstance.uniaixalMaterialTest(matList=materialList,disp=dispHistory,saveFig=False,figureName="hystereticCurve")
 
 

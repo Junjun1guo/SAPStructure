@@ -1615,10 +1615,10 @@ class MaterialTest():
         Initialize the class
         ----------------------------------------------------------------------------------------------------------------
         """
-    def uniaixalMaterialTest(self,materialStr,dispHistory):
+    def uniaixalMaterialTest(self,matList=None,disp=None,saveFig=False,figureName="figureName"):
         """"""
         from .materialTest.uniaxialMaterialTest import uniaxialMatTest
-        return uniaxialMatTest(materialStr,dispHistory)
+        return uniaxialMatTest(matList,disp,saveFig,figureName)
 
 ########################################################################################################################
 ########################################################################################################################

@@ -11,6 +11,15 @@ import time
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Polygon, Wedge
 from .modelResultsDB import h5pyDB  ##h5py database to store opensees results
+###############################
+import sys
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QToolTip, QFileDialog, QPushButton, QVBoxLayout, \
+    QHBoxLayout
+from PySide6.QtCore import Qt, QPointF, QSize, QSizeF, QMarginsF
+from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QFont, QImage, QPainter as QPainterExport, QPageSize, \
+    QPageLayout
+from PySide6.QtPrintSupport import QPrinter
+import math
 ########################################################################################################################
 class OpenSeesPyX():
     """
@@ -63,6 +72,41 @@ class OpenSeesPyX():
         #######----存储纤维截面信息
         self.currentSectTag=None
         self.fiberSectDict={}
+
+    def auxiliary_vectXY(self,a):
+        """
+        ----------------------------------------------------------------------------------------------------------------
+        obtain the normalized xvector and yvector by providing the axial vector of the element
+        a-(elemental aixal vector),eg.(x2-x1,y2-y1,z2-z1)
+        ------------------------------------------------------------
+        return
+        xVector-normalized axial vector
+        yvector-normalized y vector that perpendicular to xVector
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        ax, ay, az = a
+
+        # 选取绝对值最小分量对应的基向量
+        if abs(ax) <= abs(ay) and abs(ax) <= abs(az):
+            b = (1, 0, 0)
+        elif abs(ay) <= abs(ax) and abs(ay) <= abs(az):
+            b = (0, 1, 0)
+        else:
+            b = (0, 0, 1)
+
+        def cross_product(a, b):
+            return (
+                a[1] * b[2] - a[2] * b[1],
+                a[2] * b[0] - a[0] * b[2],
+                a[0] * b[1] - a[1] * b[0]
+            )
+        ######################################################################################
+        v = cross_product(a, b)
+        vectorNorma = np.linalg.norm(a)
+        vectorNormv = np.linalg.norm(v)
+        xVect = [a[0] / float(vectorNorma), a[1] / float(vectorNorma), a[2] / float(vectorNorma)]
+        yvect = [v[0] / float(vectorNormv), v[1] / float(vectorNormv), v[2] / float(vectorNormv)]
+        return xVect, yvect
 
     def auxiliary_localZvector(self,eleVector,refVector):
         """
@@ -402,6 +446,17 @@ class OpenSeesPyX():
         plt.axis('equal')
         plt.title(f"Section fibers-{sectTag}")
         return plt
+    ####################################################################################################################
+    def auxiliary_dicreteFiberPointsPlot(self,data_groups,colors,radius=2):
+        """
+        plot discrete fiber points (ylocal,zlocal,area)
+        data_groups-fiber data, eg. [[[bartag1,y1,z1,A1],[bartag2,y2,z2,A2],...],[[core1,y1,z1,A1],[core2,y2,z2,A2],...],...]
+        colors-color list, eg. ["red","green","blue"]
+        "red", "green", "blue", "yellow", "orange","purple", "pink", "cyan", "magenta", "brown","lime", "navy", "teal",
+        "olive", "maroon","gray", "grey", "black", "white", "gold"
+        """
+        visualizer = DataVisualizer()
+        visualizer.show_scatter_plot(data_groups=data_groups,colors=colors,radius=radius,window_title="Data Visualization")
     ####################################################################################################################
     def auxiliary_writeModelInformationToDB(self):
         """
@@ -784,47 +839,17 @@ class OpenSeesPyX():
             if equalLength<1.0e-10:
                 if "-orient" in argsList:
                     orientIndex=argsList.index('-orient')
-                    nextIndex=next((index for index, item in enumerate(argsList[int(orientIndex+1):])
-                                    if isinstance(item, str)), None)
-                    if nextIndex==None:
-                        vectNum=len(argsList)-orientIndex-1
-                        if vectNum==3:
-                            localYVector=[argsList[orientIndex+1],argsList[orientIndex+2],argsList[orientIndex+3]]
-                        else:
-                            localXVector=[argsList[orientIndex+1],argsList[orientIndex+2],argsList[orientIndex+3]]
-                            localYVector=[argsList[orientIndex+4],argsList[orientIndex+5],argsList[orientIndex+6]]
-                    else:
-                        if nextIndex==3:
-                            localYVector = [argsList[orientIndex + 1], argsList[orientIndex + 2], argsList[orientIndex + 3]]
-                        else:
-                            localXVector = [argsList[orientIndex + 1], argsList[orientIndex + 2], argsList[orientIndex + 3]]
-                            localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
+                    localXVector = [argsList[orientIndex + 1], argsList[orientIndex + 2], argsList[orientIndex + 3]]
+                    localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             else:
                 if "-orient" in argsList:
                     orientIndex=argsList.index('-orient')
-                    nextIndex=next((index for index, item in enumerate(argsList[int(orientIndex+1):])
-                                    if isinstance(item, str)), None)
-                    if nextIndex==None:
-                        vectNum=len(argsList)-orientIndex-1
-                        if vectNum==3:
-                            localYVector=[argsList[orientIndex+1],argsList[orientIndex+2],argsList[orientIndex+3]]
-                            localXVector=[nodeJCoords[0]-nodeICoords[0],nodeJCoords[1]-nodeICoords[1],
-                            nodeJCoords[2]-nodeICoords[2]]
-                        else:
-                            localXVector=[argsList[orientIndex+1],argsList[orientIndex+2],argsList[orientIndex+3]]
-                            localYVector=[argsList[orientIndex+4],argsList[orientIndex+5],argsList[orientIndex+6]]
-                    else:
-                        if nextIndex==3:
-                            localYVector = [argsList[orientIndex + 1], argsList[orientIndex + 2], argsList[orientIndex + 3]]
-                            localXVector = [nodeJCoords[0] - nodeICoords[0], nodeJCoords[1] - nodeICoords[1],
-                                            nodeJCoords[2] - nodeICoords[2]]
-                        else:
-                            localXVector = [argsList[orientIndex + 1], argsList[orientIndex + 2], argsList[orientIndex + 3]]
-                            localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
+                    localXVector = [argsList[orientIndex + 1], argsList[orientIndex + 2], argsList[orientIndex + 3]]
+                    localYVector = [argsList[orientIndex + 4], argsList[orientIndex + 5], argsList[orientIndex + 6]]
             self.eleSetNameList.append(tipValue + "_ele")
             self.EleLocalCoordSysSetNameList.append(tipValue + "_eleLocCordSys")
             self.saveEleList.append([[eleTag] + eleNodes+["1D"],tipValue + "_ele"])
-            self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1], localXVector, localYVector],
+            self.EleLocalCoordSys.append([['specialEle', eleNodes[0], eleNodes[1]]+localXVector+localYVector,
                                           tipValue + "_eleLocCordSys"])
         ################################################################################################################
         elif eleType in ['Tri31','tri31']:
@@ -2979,6 +3004,542 @@ class OpenSeesPyX():
             ############################################################################################################
         if f is not None:
             f.close()
+########################################################################################################################
+########################################################################################################################
+class ScatterPlotWidget(QWidget):
+    def __init__(self, data_groups, colors=None, radius=10, parent=None):
+        """
+        data_groups: list of lists, each sublist contains [id, y, z, area]
+        colors: list of colors for each group (optional)
+        radius: circle radius in pixels (all points same size)
+        """
+        super().__init__(parent)
+        self.data_groups = data_groups
+        self.radius = radius
+        self.selected_point = None
+        self.setMinimumSize(800, 600)
+        self.setMouseTracking(True)
+
+        # Flatten data for range calculation
+        self.all_data = []
+        self.group_indices = []
+        for group_idx, group in enumerate(data_groups):
+            for item in group:
+                self.all_data.append(item)
+                self.group_indices.append(group_idx)
+
+        # Extract coordinates and areas
+        self.y_coords = [item[1] for item in self.all_data]
+        self.z_coords = [item[2] for item in self.all_data]
+        self.areas = [item[3] for item in self.all_data]
+
+        # Calculate data range
+        self.y_min = min(self.y_coords)
+        self.y_max = max(self.y_coords)
+        self.z_min = min(self.z_coords)
+        self.z_max = max(self.z_coords)
+
+        # Calculate aspect ratio
+        self.data_width = self.y_max - self.y_min if self.y_max != self.y_min else 1
+        self.data_height = self.z_max - self.z_min if self.z_max != self.z_min else 1
+        self.data_aspect_ratio = self.data_width / self.data_height
+
+        # Store original color names
+        self.color_names = []
+
+        # Generate colors if not provided
+        if colors is None or len(colors) < len(data_groups):
+            self.colors = self.generate_colors(len(data_groups))
+            self.color_names = [f"Auto Color {i + 1}" for i in range(len(data_groups))]
+        else:
+            self.colors = []
+            for c in colors:
+                parsed_color = self.parse_color(c)
+                self.colors.append(parsed_color)
+                # Store color name
+                if isinstance(c, str):
+                    self.color_names.append(c)
+                elif isinstance(c, tuple):
+                    self.color_names.append(f"RGB{c}")
+                else:
+                    self.color_names.append("Custom Color")
+
+        # Margins
+        self.margin_left = 80
+        self.margin_right = 40
+        self.margin_top = 40
+        self.margin_bottom = 80
+
+    def generate_colors(self, n):
+        """Generate n distinct colors"""
+        colors = []
+        for i in range(n):
+            hue = (i * 360 / n) % 360
+            color = QColor.fromHsv(int(hue), 200, 220, 255)
+            colors.append(color)
+        return colors
+
+    def parse_color(self, color):
+        """Parse color from various formats"""
+        # Predefined color mapping
+        color_map = {
+            "red": (255, 0, 0),
+            "green": (0, 255, 0),
+            "blue": (0, 0, 255),
+            "yellow": (255, 255, 0),
+            "orange": (255, 165, 0),
+            "purple": (128, 0, 128),
+            "pink": (255, 192, 203),
+            "cyan": (0, 255, 255),
+            "magenta": (255, 0, 255),
+            "brown": (165, 42, 42),
+            "lime": (0, 255, 0),
+            "navy": (0, 0, 128),
+            "teal": (0, 128, 128),
+            "olive": (128, 128, 0),
+            "maroon": (128, 0, 0),
+            "gray": (128, 128, 128),
+            "grey": (128, 128, 128),
+            "black": (0, 0, 0),
+            "white": (255, 255, 255),
+            "gold": (255, 215, 0)
+        }
+
+        if isinstance(color, QColor):
+            return color
+        elif isinstance(color, str):
+            # Check if it's a predefined color name
+            color_lower = color.lower()
+            if color_lower in color_map:
+                rgb = color_map[color_lower]
+                return QColor(rgb[0], rgb[1], rgb[2], 255)
+            else:
+                # Try to parse as hex or Qt color name
+                c = QColor(color)
+                if c.isValid():
+                    c.setAlpha(255)
+                    return c
+                else:
+                    # Default color if invalid
+                    return QColor(100, 100, 200, 255)
+        elif isinstance(color, tuple) and len(color) >= 3:
+            if len(color) == 3:
+                return QColor(color[0], color[1], color[2], 255)
+            else:
+                return QColor(color[0], color[1], color[2], color[3])
+        else:
+            return QColor(100, 100, 200, 255)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Background
+        painter.fillRect(self.rect(), QColor(255, 255, 255))
+
+        # Draw axes
+        self.draw_axes(painter)
+
+        # Draw grid
+        self.draw_grid(painter)
+
+        # Draw points
+        self.draw_points(painter)
+
+    def get_plot_rect(self):
+        """Calculate plot area based on data aspect ratio"""
+        available_width = self.width() - self.margin_left - self.margin_right
+        available_height = self.height() - self.margin_top - self.margin_bottom
+        available_aspect_ratio = available_width / available_height
+
+        if self.data_aspect_ratio > available_aspect_ratio:
+            plot_width = available_width
+            plot_height = available_width / self.data_aspect_ratio
+        else:
+            plot_height = available_height
+            plot_width = available_height * self.data_aspect_ratio
+
+        x_offset = self.margin_left + (available_width - plot_width) / 2
+        y_offset = self.margin_top + (available_height - plot_height) / 2
+
+        return x_offset, y_offset, plot_width, plot_height
+
+    def draw_grid(self, painter):
+        """Draw grid lines"""
+        x_offset, y_offset, plot_width, plot_height = self.get_plot_rect()
+
+        pen = QPen(QColor(230, 230, 230), 1, Qt.DashLine)
+        painter.setPen(pen)
+
+        # Vertical grid lines
+        for i in range(1, 10):
+            x = x_offset + plot_width * i / 10
+            painter.drawLine(int(x), int(y_offset),
+                             int(x), int(y_offset + plot_height))
+
+        # Horizontal grid lines
+        for i in range(1, 10):
+            y = y_offset + plot_height * i / 10
+            painter.drawLine(int(x_offset), int(y),
+                             int(x_offset + plot_width), int(y))
+
+    def draw_axes(self, painter):
+        """Draw coordinate axes"""
+        x_offset, y_offset, plot_width, plot_height = self.get_plot_rect()
+
+        pen = QPen(QColor(0, 0, 0), 2)
+        painter.setPen(pen)
+
+        # Y axis (left)
+        painter.drawLine(int(x_offset), int(y_offset),
+                         int(x_offset), int(y_offset + plot_height))
+
+        # Z axis (bottom)
+        painter.drawLine(int(x_offset), int(y_offset + plot_height),
+                         int(x_offset + plot_width), int(y_offset + plot_height))
+
+        # Draw ticks and labels
+        font = QFont("Arial", 9)
+        painter.setFont(font)
+
+        # Z axis label (vertical) - closer to axis
+        painter.save()
+        painter.translate(25, int(y_offset + plot_height / 2))
+        painter.rotate(-90)
+        painter.drawText(0, 0, "Z")
+        painter.restore()
+
+        # Y axis label (horizontal) - closer to axis
+        painter.drawText(int(x_offset + plot_width / 2 - 5),
+                         self.height() - 25, "Y")
+
+        # Z axis ticks (left side) - 2 decimal places
+        num_ticks = 6
+        for i in range(num_ticks):
+            z_val = self.z_min + (self.z_max - self.z_min) * i / (num_ticks - 1)
+            y_pos = y_offset + plot_height - (plot_height * i / (num_ticks - 1))
+            painter.drawLine(int(x_offset - 5), int(y_pos),
+                             int(x_offset), int(y_pos))
+            painter.drawText(int(x_offset - 70), int(y_pos + 5), f"{z_val:.2f}")
+
+        # Y axis ticks (bottom) - 2 decimal places
+        for i in range(num_ticks):
+            y_val = self.y_min + (self.y_max - self.y_min) * i / (num_ticks - 1)
+            x_pos = x_offset + (plot_width * i / (num_ticks - 1))
+            painter.drawLine(int(x_pos), int(y_offset + plot_height),
+                             int(x_pos), int(y_offset + plot_height + 5))
+            painter.drawText(int(x_pos - 20), int(y_offset + plot_height + 20),
+                             f"{y_val:.2f}")
+
+    def draw_points(self, painter):
+        """Draw data points"""
+        x_offset, y_offset, plot_width, plot_height = self.get_plot_rect()
+
+        for i, item in enumerate(self.all_data):
+            idx, y, z, area = item
+            group_idx = self.group_indices[i]
+
+            # Convert to screen coordinates
+            x_screen = x_offset + ((y - self.y_min) / self.data_width) * plot_width
+            y_screen = y_offset + plot_height - ((z - self.z_min) / self.data_height) * plot_height
+
+            # Get color for this group
+            color = self.colors[group_idx]
+
+            # Draw circle with same color for fill and border (all same size)
+            brush = QBrush(color)
+            painter.setBrush(brush)
+            pen = QPen(color, 1.5)
+            painter.setPen(pen)
+            painter.drawEllipse(QPointF(x_screen, y_screen), self.radius, self.radius)
+
+    def mousePressEvent(self, event):
+        """Mouse click event"""
+        if event.button() == Qt.LeftButton:
+            self.check_point_click(event.pos())
+
+    def mouseMoveEvent(self, event):
+        """Mouse move event"""
+        self.check_point_hover(event.pos())
+
+    def check_point_click(self, pos):
+        """Check if a point was clicked"""
+        x_offset, y_offset, plot_width, plot_height = self.get_plot_rect()
+
+        for i, item in enumerate(self.all_data):
+            idx, y, z, area = item
+            group_idx = self.group_indices[i]
+
+            # Convert to screen coordinates
+            x_screen = x_offset + ((y - self.y_min) / self.data_width) * plot_width
+            y_screen = y_offset + plot_height - ((z - self.z_min) / self.data_height) * plot_height
+
+            # Calculate distance
+            distance = math.sqrt((pos.x() - x_screen) ** 2 + (pos.y() - y_screen) ** 2)
+
+            if distance <= self.radius:
+                self.selected_point = i
+                self.show_tooltip(pos, item, group_idx)
+                return
+
+    def check_point_hover(self, pos):
+        """Check mouse hover"""
+        x_offset, y_offset, plot_width, plot_height = self.get_plot_rect()
+
+        for i, item in enumerate(self.all_data):
+            idx, y, z, area = item
+
+            # Convert to screen coordinates
+            x_screen = x_offset + ((y - self.y_min) / self.data_width) * plot_width
+            y_screen = y_offset + plot_height - ((z - self.z_min) / self.data_height) * plot_height
+
+            # Calculate distance
+            distance = math.sqrt((pos.x() - x_screen) ** 2 + (pos.y() - y_screen) ** 2)
+
+            if distance <= self.radius:
+                self.setCursor(Qt.PointingHandCursor)
+                return
+
+        self.setCursor(Qt.ArrowCursor)
+
+    def show_tooltip(self, pos, item, group_idx):
+        """Show tooltip - coordinates with 6 decimals, area with 9 decimals, and color name"""
+        idx, y, z, area = item
+        color_name = self.color_names[group_idx] if group_idx < len(self.color_names) else "Unknown"
+        tooltip_text = f"ID: {idx}\nY: {y:.6f}\nZ: {z:.6f}\nArea: {area:.9f}\nColor: {color_name}"
+        QToolTip.showText(self.mapToGlobal(pos), tooltip_text, self)
+
+    def render_to_painter(self, painter, width, height):
+        """Render the plot to a given painter with specified dimensions"""
+        # Temporarily adjust widget size for rendering
+        old_size = self.size()
+        self.resize(width, height)
+
+        # Draw on painter
+        painter.fillRect(0, 0, width, height, QColor(255, 255, 255))
+        self.draw_axes(painter)
+        self.draw_grid(painter)
+        self.draw_points(painter)
+
+        # Restore original size
+        self.resize(old_size)
+
+    def export_to_png(self, filename, width=1920, height=1440, dpi=300):
+        """Export plot to PNG file"""
+        # Create image with specified size
+        image = QImage(width, height, QImage.Format_RGB32)
+        image.fill(QColor(255, 255, 255))
+
+        # Set DPI
+        dpi_to_dpm = dpi / 0.0254  # Convert DPI to dots per meter
+        image.setDotsPerMeterX(int(dpi_to_dpm))
+        image.setDotsPerMeterY(int(dpi_to_dpm))
+
+        # Create painter for the image
+        painter = QPainterExport(image)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Render plot
+        self.render_to_painter(painter, width, height)
+
+        painter.end()
+
+        # Save image
+        return image.save(filename, "PNG", 100)
+
+    def export_to_jpg(self, filename, width=1920, height=1440, dpi=300, quality=95):
+        """Export plot to JPG file"""
+        # Create image with specified size
+        image = QImage(width, height, QImage.Format_RGB32)
+        image.fill(QColor(255, 255, 255))
+
+        # Set DPI
+        dpi_to_dpm = dpi / 0.0254  # Convert DPI to dots per meter
+        image.setDotsPerMeterX(int(dpi_to_dpm))
+        image.setDotsPerMeterY(int(dpi_to_dpm))
+
+        # Create painter for the image
+        painter = QPainterExport(image)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Render plot
+        self.render_to_painter(painter, width, height)
+
+        painter.end()
+
+        # Save image with quality setting
+        return image.save(filename, "JPG", quality)
+
+    def export_to_eps(self, filename, width=1920, height=1440, dpi=300):
+        """Export plot to EPS file (using PostScript printer)"""
+        printer = QPrinter(QPrinter.HighResolution)
+        printer.setOutputFileName(filename)
+        printer.setOutputFormat(QPrinter.PdfFormat)  # Qt6 uses PDF format
+        printer.setResolution(dpi)
+
+        # Set page size (convert pixels to mm)
+        width_mm = width * 25.4 / dpi
+        height_mm = height * 25.4 / dpi
+        page_size = QPageSize(QSizeF(width_mm, height_mm), QPageSize.Millimeter)
+        printer.setPageSize(page_size)
+        printer.setPageMargins(QMarginsF(0, 0, 0, 0), QPageLayout.Millimeter)
+
+        # Create painter for the printer
+        painter = QPainterExport(printer)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Calculate scaling factor
+        scale_x = printer.width() / width
+        scale_y = printer.height() / height
+        scale = min(scale_x, scale_y)
+
+        # Scale and render
+        painter.scale(scale, scale)
+        self.render_to_painter(painter, width, height)
+
+        painter.end()
+
+        return True
+########################################################################################################################
+########################################################################################################################
+class MainWindow(QMainWindow):
+    def __init__(self, data_groups, colors=None, radius=10, window_title="Scatter Plot"):
+        super().__init__()
+        self.setWindowTitle(window_title)
+        self.setGeometry(100, 100, 1000, 850)
+
+        # Create central widget and layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+
+        # Create scatter plot widget
+        self.scatter_plot = ScatterPlotWidget(data_groups, colors, radius)
+        layout.addWidget(self.scatter_plot)
+
+        # Create button layout
+        button_layout = QHBoxLayout()
+
+        # Export buttons
+        self.btn_export_png = QPushButton("Export PNG")
+        self.btn_export_jpg = QPushButton("Export JPG")
+        self.btn_export_eps = QPushButton("Export EPS")
+
+        self.btn_export_png.clicked.connect(self.export_png)
+        self.btn_export_jpg.clicked.connect(self.export_jpg)
+        self.btn_export_eps.clicked.connect(self.export_eps)
+
+        button_layout.addWidget(self.btn_export_png)
+        button_layout.addWidget(self.btn_export_jpg)
+        button_layout.addWidget(self.btn_export_eps)
+        button_layout.addStretch()
+
+        layout.addLayout(button_layout)
+
+    def export_png(self):
+        """Export to PNG"""
+        filename, _ = QFileDialog.getSaveFileName(
+            self, "Export PNG", "", "PNG Files (*.png)"
+        )
+        if filename:
+            if not filename.lower().endswith('.png'):
+                filename += '.png'
+            try:
+                success = self.scatter_plot.export_to_png(filename, width=1920, height=1440, dpi=300)
+                if success:
+                    print(f"Successfully exported to {filename}")
+                else:
+                    print(f"Failed to export to {filename}")
+            except Exception as e:
+                print(f"Error exporting PNG: {e}")
+
+    def export_jpg(self):
+        """Export to JPG"""
+        filename, _ = QFileDialog.getSaveFileName(
+            self, "Export JPG", "", "JPG Files (*.jpg *.jpeg)"
+        )
+        if filename:
+            if not (filename.lower().endswith('.jpg') or filename.lower().endswith('.jpeg')):
+                filename += '.jpg'
+            try:
+                success = self.scatter_plot.export_to_jpg(filename, width=1920, height=1440, dpi=300, quality=95)
+                if success:
+                    print(f"Successfully exported to {filename}")
+                else:
+                    print(f"Failed to export to {filename}")
+            except Exception as e:
+                print(f"Error exporting JPG: {e}")
+
+    def export_eps(self):
+        """Export to EPS (saved as PDF in Qt6)"""
+        filename, _ = QFileDialog.getSaveFileName(
+            self, "Export EPS", "", "EPS Files (*.eps);;PDF Files (*.pdf)"
+        )
+        if filename:
+            # Accept both .eps and .pdf extensions
+            if not (filename.lower().endswith('.eps') or filename.lower().endswith('.pdf')):
+                filename += '.eps'
+            try:
+                success = self.scatter_plot.export_to_eps(filename, width=1920, height=1440, dpi=300)
+                if success:
+                    print(f"Successfully exported to {filename}")
+                    if filename.lower().endswith('.eps'):
+                        print("Note: File is saved in PDF format (Qt6 limitation)")
+                else:
+                    print(f"Failed to export to {filename}")
+            except Exception as e:
+                print(f"Error exporting EPS: {e}")
+########################################################################################################################
+########################################################################################################################
+class DataVisualizer:
+    """Class that contains the scatter plot visualization method"""
+
+    def __init__(self):
+        self.app = None
+        self.window = None
+
+    def show_scatter_plot(self, data_groups, colors=None, radius=10, window_title="Scatter Plot"):
+        """
+        Display scatter plot with given data
+
+        Parameters:
+        -----------
+        data_groups : list
+            List of groups, each group is a list of [id, y, z, area]
+            Example: [
+                [[1, 10, 20, 100], [2, 15, 25, 200]],  # Group 1
+                [[3, 30, 35, 150], [4, 35, 40, 180]],  # Group 2
+            ]
+        colors : list, optional
+            List of colors for each group. Supported formats:
+            - Color names (string): "red", "green", "blue", "yellow", "orange",
+                                   "purple", "pink", "cyan", "magenta", "brown",
+                                   "lime", "navy", "teal", "olive", "maroon",
+                                   "gray", "grey", "black", "white", "gold"
+            - RGB tuple: (255, 0, 0)
+            - RGBA tuple: (255, 0, 0, 255)
+            - Hex string: "#FF0000"
+            - QColor object
+        radius : int, optional
+            Circle radius in pixels (default: 10, all points same size)
+        window_title : str, optional
+            Window title (default: "Scatter Plot")
+        """
+        # Create QApplication if not exists
+        if self.app is None:
+            self.app = QApplication.instance()
+            if self.app is None:
+                self.app = QApplication(sys.argv)
+
+        # Create main window with export buttons
+        self.window = MainWindow(data_groups, colors, radius, window_title)
+
+        # Show window
+        self.window.show()
+
+        # Execute event loop
+        sys.exit(self.app.exec())
+########################################################################################################################
 ########################################################################################################################
 if __name__ == "__main__":
     pass
