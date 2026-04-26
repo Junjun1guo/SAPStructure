@@ -2709,11 +2709,16 @@ class OpenSeesPyX():
         ################################################################################################################
         ################################################################################################################
         writeInterNum=200 ###---每200时间步将结果写入数据库一次
+        # value=ops.eleResponse(146,'section',1,'fiber',0.03286994993686676,-1.2389938831329346,501,'stressStrain')
+        #                 print("fiberResponse=",value)
+        #############################################
         f=None
         if recordList!=None:
             ######################################################################
             dbPath = self.saveInstance._dbPath
             f = h5py.File(dbPath, 'a', libver='latest')
+            ######################################################################
+            fiberDict={}
             ######################################################################
             nodeDict={}
             trussEleResponseDict={}
@@ -2722,6 +2727,7 @@ class OpenSeesPyX():
             nonEleSectResponsesDict={}
             nonEleSectNumberDict={}
             nonZeroEleResponsesDict={}
+            nonEleFiberResponsesDict={}
             for each in recordList:
                 if each[0]=='node':
                     nodeIdenty, resType,nodeTags= each[0], each[1], each[2]
@@ -2747,6 +2753,13 @@ class OpenSeesPyX():
                     responseType,eleTags = each[1], each[2]
                     eleItemDict = {('nonZeroEle_' + responseType + '_' + str(eachEle)): [] for eachEle in eleTags}
                     nonZeroEleResponsesDict = {**nonZeroEleResponsesDict, **eleItemDict}  ##Merge two dicts
+                elif each[0]=='nonEleFiber':
+                    eleTag,sectNum,fiberList=each[1],each[3],each[4]
+                    for eachFiber in each[4]:
+                        if eachFiber[0] not in fiberDict.keys():
+                            fiberDict[eachFiber[0]]=eachFiber[1:] ### [[fiberTag,[yc,zc],501],...]->fiberTag:[[yc,zc],501]
+                    fiberItemDict={('nonEleFiber_'+str(eleTag)+"_"+str(sectNum)+"_"+str(each[0])):[] for each in fiberList}
+                    nonEleFiberResponsesDict={**nonEleFiberResponsesDict,**fiberItemDict}
         ######################################################
         ######################################################
         startTime = time.perf_counter()
@@ -2768,7 +2781,7 @@ class OpenSeesPyX():
                     deltaT=currentDt
             ####['NormDispIncr', 'RelativeEnergyIncr', 'EnergyIncr', 'RelativeNormUnbalance',
             ##### 'RelativeNormDispIncr', 'NormUnbalance']
-            ops.test('NormDispIncr', tol,maxNumIter)
+            ops.test('NormDispIncr',tol,maxNumIter)
             #####['KrylovNewton',, ['SecantNewton','-initial'], ['ModifiedNewton','-initial'],
             ##### ['RaphsonNewton','-initial'], 'PeriodicNewton','BFGS', 'Broyden', 'NewtonLineSearch'],前四个zengjia,'-initial'
             ops.algorithm('ModifiedNewton','-initial')  ##收敛性好于前两个
@@ -2954,6 +2967,54 @@ class OpenSeesPyX():
                     ###################################################################################################
                     ###################################################################################################
                     ###################################################################################################
+                    if nonEleFiberResponsesDict:  ###-记录截面纤维响应
+                        eleKeys = nonEleFiberResponsesDict.keys()
+                        digitNumDict = {'fiberStress':3, 'fiberStrain': 10}
+                        if (len(nonEleFiberResponsesDict[list(eleKeys)[0]]) >= writeInterNum) or (tCurrent >= tFinal):
+                            # for eachkey in eleKeys:
+                            #     eleTag= eachkey.split("_")[1]
+                            #     sectNum=eachkey.split("_")[2]
+                            #     fiberTag=eachkey.split("_")[3]
+                            #     saveValueList = nonEleFiberResponsesDict[('nonEleFiber_'+str(eleTag)+"_"+str(sectNum)+"_"+str(fiberTag))]
+                            #     saveName = f"timeHistoryResponse_element/nonEleFiber_{eleTag}_{sectNum}_{fiberTag}"
+                            #     numArgs=len(saveValueList[0])-1
+                            #     headNameList = ["time"]
+                            #     for i2 in range(numArgs):
+                            #         headNameList.append(f"value_{i2 + 1}")
+                            #     saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)
+                            ##########################################################################
+                            [[eleTag:= eachkey.split("_")[1],sectNum:=eachkey.split("_")[2],fiberTag:=eachkey.split("_")[3],
+                              saveValueList:= nonEleFiberResponsesDict[('nonEleFiber_'+str(eleTag)+"_"+str(sectNum)+"_"+str(fiberTag))],
+                              saveName:= f"timeHistoryResponse_element/nonEleFiber_{eleTag}_{sectNum}_{fiberTag}",
+                              numArgs:=len(saveValueList[0])-1,headNameList:= ["time"],[headNameList.append(f"value_{i2 + 1}")
+                            for i2 in range(numArgs)],saveDataIntoOpenedDB(f, saveName, saveValueList, headNameList)] for eachkey in eleKeys]
+                            ###########################################################################
+                            f.flush()
+                            for eachkey in eleKeys:
+                                nonEleFiberResponsesDict[eachkey] = []
+                            ########################################################################
+                            ###-record fiber stress strain
+                        # for eachkey in eleKeys:
+                        #     eleTag = eachkey.split("_")[1]
+                        #     sectNum = eachkey.split("_")[2]
+                        #     fiberTag = eachkey.split("_")[3]
+                        #     yc=fiberDict[int(fiberTag)][0][0]
+                        #     zc = fiberDict[int(fiberTag)][0][1]
+                        #     matTag=fiberDict[int(fiberTag)][1]
+                        #     stress,strain=eval(f"ops.eleResponse({eleTag},'section',{sectNum},'fiber',{yc},{zc},{matTag},'stressStrain')")
+                        #     tempValue= [round(tCurrent, 4)] + [round(stress,3),round(strain,9)]
+                        #     nonEleFiberResponsesDict[f'nonEleFiber_{eleTag}_{sectNum}_{fiberTag}'].append(tempValue)
+                        ##########################################
+                        [[eleTag:= eachkey.split("_")[1],sectNum:= eachkey.split("_")[2],fiberTag:= eachkey.split("_")[3],
+                          yc:=fiberDict[int(fiberTag)][0][0],zc:= fiberDict[int(fiberTag)][0][1],
+                          matTag:=fiberDict[int(fiberTag)][1],stress:=eval(f"ops.eleResponse({eleTag},'section',"
+                        f"{sectNum},'fiber',{yc},{zc},{matTag},'stressStrain')")[0],strain:=eval(f"ops.eleResponse({eleTag},'section',"
+                        f"{sectNum},'fiber',{yc},{zc},{matTag},'stressStrain')")[1],
+                          tempValue:= [round(tCurrent, 4)] + [round(stress,3),round(strain,9)],
+                          nonEleFiberResponsesDict[f'nonEleFiber_{eleTag}_{sectNum}_{fiberTag}'].append(tempValue)] for eachkey in eleKeys]
+                    ###################################################################################################
+                    ###################################################################################################
+                    ###################################################################################################
                     if nonZeroEleResponsesDict:
                         eleKeys = nonZeroEleResponsesDict.keys()
                         if (len(nonZeroEleResponsesDict[list(eleKeys)[0]])>=writeInterNum) or (tCurrent>=tFinal):
@@ -2995,7 +3056,7 @@ class OpenSeesPyX():
                 print('KrylovNewton',f'ground motion={waveNumber}','tol=',tol,'maxNumIter=',maxNumIter, 'totalTime=',
                       tFinal, 'tCurrent=',"{:.6f}".format(tCurrent),'time cost=', "{:.1f}".format(realTime), 'second')
             else:
-                if deltaT>=0.000001*currentDt:
+                if deltaT>=1e-20*currentDt:
                     deltaT=deltaT*0.5
                     print("The initial dt is:",currentDt,", and the decrease current dt is:",deltaT)
                 else:
