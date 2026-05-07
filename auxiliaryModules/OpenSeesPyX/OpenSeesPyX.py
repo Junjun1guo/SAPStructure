@@ -2781,11 +2781,12 @@ class OpenSeesPyX():
                     deltaT=currentDt
             ####['NormDispIncr', 'RelativeEnergyIncr', 'EnergyIncr', 'RelativeNormUnbalance',
             ##### 'RelativeNormDispIncr', 'NormUnbalance']
-            ops.test('NormDispIncr',tol,maxNumIter)
+            ops.test('NormDispIncr',tol,maxNumIter,0,2)
+            # ops.test('EnergyIncr', 1.0e-5, 500, 0)
             #####['KrylovNewton',, ['SecantNewton','-initial'], ['ModifiedNewton','-initial'],
             ##### ['RaphsonNewton','-initial'], 'PeriodicNewton','BFGS', 'Broyden', 'NewtonLineSearch'],前四个zengjia,'-initial'
-            ops.algorithm('ModifiedNewton','-initial')  ##收敛性好于前两个
-            # ops.algorithm('KrylovNewton')
+            # ops.algorithm('ModifiedNewton','-initial')  ##收敛性好于前两个
+            ops.algorithm('KrylovNewton')
             NewmarkGamma = 0.5
             NewmarkBeta = 0.25
             ops.integrator('Newmark', NewmarkGamma, NewmarkBeta)
@@ -3056,7 +3057,7 @@ class OpenSeesPyX():
                 print('KrylovNewton',f'ground motion={waveNumber}','tol=',tol,'maxNumIter=',maxNumIter, 'totalTime=',
                       tFinal, 'tCurrent=',"{:.6f}".format(tCurrent),'time cost=', "{:.1f}".format(realTime), 'second')
             else:
-                if deltaT>=1e-20*currentDt:
+                if deltaT>=1e-8*currentDt:
                     deltaT=deltaT*0.5
                     print("The initial dt is:",currentDt,", and the decrease current dt is:",deltaT)
                 else:
