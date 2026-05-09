@@ -408,7 +408,6 @@ class HystereticCurveAnalysis():
 				i += 2
 			else:
 				i += 1
-
 		print(f"Extracted {len(full_loops)} complete hysteresis loops\n")
 
 		# ---- 5. Plot ----
@@ -470,7 +469,14 @@ class HystereticCurveAnalysis():
 				  f"{lp['neg_peak_disp']:<10.3f} {lp['neg_peak_force']:<10.3f} "
 				  f"{lp['energy_dissipated']:<12.3f} {lp['elastic_strain_energy_es']:<12.3f} "
 				  f"{lp['eq_damping_ratio']:<12.4f} {lp['num_points']:<8}")
-		return full_loops
+		########################################################
+		if saveData:
+			loopValue=full_loops[loopNumber-1]
+			saveDataValue = []
+			for eachx, eachy in zip(loopValue['x'], loopValue['y']):
+				saveDataValue.append([eachx, eachy])
+			np.savetxt(f"loop-{loopNumber}.txt", saveDataValue, fmt="%.6f %.6f")
+
 
 	def yAxisDataTranslation(self,startX:float,endX:float):
 		"""
