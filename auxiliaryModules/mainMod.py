@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import comtypes.client
 import comtypes.client
+from pathlib import Path
+import matplotlib.pyplot as plt
 ########################################################################################################################
 ########################################################################################################################
 class SectionFiberDivide():
@@ -1820,6 +1822,169 @@ def responseSpectraCalculation(acc:list,dt:float,T:list,beta:float):
     return saArray, svArray, sdArray
 ########################################################################################################################
 ########################################################################################################################
+class NearFaultGroundMotionSim_twoComp_specificPulseParas():
+    """
+    --------------------------------------------------------------------------------------------------------------------
+    A class for simulating near-fault pulse and the corresponding orthogonal components in horizontal plane. The velocity
+    pulse magnitude (Vp) and pulse period (Tp) can be specified.
+    Environemet: Successfully executed in python 3.13
+    Date: 2026-07-06
+    --------------------------------------------------------------------------------------------------------------------
+    ** **************************************************************************** **
+    ** (C) Copyright 2026, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
+    --------------------------------------------------------------------------------------------------------------------
+    ###---Example
+
+    --------------------------------------------------------------------------------------------------------------------
+    """
+
+    def __init__(self,faultType,moment, zTOR, Rrup,Vs30, s_or_d,theta_or_phi,numSimMotions_perLoop):
+        """
+        1. The lower and upper bounds can be same
+        2. The time interval of the simulated motion is 0.005 s
+        ----------------------------------------------------------------------------------------------------------------
+        faultType(str): type of faulting,including ["strikeSlip","reverseAndReverseOblique"]
+		momentMag(float): moment magnitude of an Earthquake, [5.5,7.9]
+		zTOR(float,km): depth to the top of the rupture plane in kilometers, larger or equal to 0
+		Rrup(float,km): the closest distance from the site to the fault rupture in kilometers, [0.07,31]
+		Vs30(float,m/s): site soil shear wave average velocity over the top 30 meters in meters per second,[139,2016]
+		s_or_d(float,km): directivity parameters s or d (input the large of s and d), [1.2,135]
+		theta_or_phi(float,degrees): directivity angle theta or phi (input corresponding to s_or_d) [0,90]
+		numSimMotions(int): the number of simulated ground motion time histories
+        ------------------------------------------
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        from .nearFaultGroundMotionSimulation_twoComponents.nearFaultGroundMotionSimulation_specificPulseParaValues import NearFaultMotionSim
+        simulationType = "onlyPulse"  ##Including: ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]
+
+        self.nearFaultMotionSimInstance=NearFaultMotionSim(faultType, simulationType,moment,zTOR, Rrup, Vs30, s_or_d,
+                                                           theta_or_phi,numSimMotions_perLoop)
+
+    @staticmethod
+    def timeHistoryPlot(folderName, motionNumber=1):
+        """
+        plot acceleration, velocity and displacement time histories for the pulse component, orthogonal component and
+        pulse model. time interval is 0.005 s
+        ----------------------------------------------------------------------------------------------------------------
+        folderName(str)-the folder name that sotore generated motions
+        motionNumber(int)-the number of motion to be plotted
+        """
+        from .nearFaultGroundMotionSimulation_twoComponents.nearFaultGroundMotionSimulation_specificPulseParaValues import \
+            timeHistoryPlot
+        timeHistoryPlot(folderName=folderName, motionNumber=motionNumber)
+
+    @staticmethod
+    def responseSpectraPlot(folderName, maxPeriod=10, beta=0.05, logCoord=True, SaLim=[0.01, 10], SvLim=[0.01, 500],
+                            SdLim=[0.001, 500]):
+        """
+        plot acceleration, velocity and displacement response spectra. time interval is 0.005 s
+        ----------------------------------------------------------------------------------------------------------------
+        folderName(str)-the folder name that sotore generated motions
+        maxPeriod(float)-the maximum period for response spectra plotting
+        beta(float)-damping ratio, default value is 0.05
+        lodCoord(bool)-Base-10 logarithmic coordinates, the default Value is True
+        SaLim,SvLim,SdLim(list)-the minimum and maximum value for y coordinate
+        """
+        from .nearFaultGroundMotionSimulation_twoComponents.nearFaultGroundMotionSimulation_specificPulseParaValues import \
+            responseSpectraPlot
+        responseSpectraPlot(folderName=folderName,maxPeriod=maxPeriod,beta=beta,logCoord=logCoord,SaLim=SaLim,SvLim=SvLim,SdLim=SdLim)
+
+    def runSpecificPulseMotion(self,Vp,Tp):
+        """
+        Vp(cm/s)-velocity pulse magnitude, None means no specific value for Vp
+        Tp(s)-velocity pulse period, None means no specific value for Tp
+        """
+        pulseComponnetsList, pulseParas =self.nearFaultMotionSimInstance.runSpecificPulseMotion(Vp=Vp, Tp=Tp)
+        return pulseComponnetsList,pulseParas
+########################################################################################################################
+########################################################################################################################
+class NearFaultGroundMotionSim_twoComp():
+    """
+    --------------------------------------------------------------------------------------------------------------------
+    A class for simulating near-fault pulse and the corresponding orthogonal components in horizontal plane.
+    Environemet: Successfully executed in python 3.13
+    Date: 2026-07-06
+    --------------------------------------------------------------------------------------------------------------------
+    ** **************************************************************************** **
+    ** (C) Copyright 2026, School of Civil Engineering,Beijing Jiaotong University  **
+    ** All Rights Reserved.                                                         **
+    **                                                                              **
+    ** Commercial use of this program is strictly prohibited.                       **
+    **                                                                              **
+    ** Developed by:                                                                **
+    **   Junjun Guo,Beijing Jiaotong University. https://github.com/Junjun1guo      **
+    **   jjguo2@bjtu.edu.cn/guojj_ce@163.com                                        **
+    ** **************************************************************************** **
+    --------------------------------------------------------------------------------------------------------------------
+    ###---Example
+    --------------------------------------------------------------------------------------------------------------------
+    """
+
+    def __init__(self,faultType, simulationType, moment, zTOR, Rrup,Vs30, s_or_d,theta_or_phi,numSimperLoop):
+        """
+        1. The lower and upper bounds can be same
+        2. The time interval of the simulated motion is 0.005 s
+        ----------------------------------------------------------------------------------------------------------------
+        faultType(str): type of faulting,including ["strikeSlip","reverseAndReverseOblique"]
+        simulationType(str): Including: ["pulseAndNoPulse","onlyPulse","onlyNoPulse"]
+		moment(float): moment magnitude of an Earthquake, [5.5,7.9]
+		zTOR(float,km): depth to the top of the rupture plane in kilometers, larger or equal to 0
+		Rrup(float,km): the closest distance from the site to the fault rupture in kilometers, [0.07,31]
+		Vs30(float,m/s): site soil shear wave average velocity over the top 30 meters in meters per second,[139,2016]
+		s_or_d(float,km): directivity parameters s or d (input the large of s and d), [1.2,135]
+		theta_or_phi(float,degrees): directivity angle theta or phi (input corresponding to s_or_d) [0,90]
+		numSimperLoop(int): the number of simulated ground motion time histories
+        ------------------------------------------
+        ----------------------------------------------------------------------------------------------------------------
+        """
+        from .nearFaultGroundMotionSimulation_twoComponents.nearFaultGroundMotionSimulation import NearFaultMotionSim
+
+        self.nearFaultMotionSimInstance=NearFaultMotionSim(faultType, simulationType, moment, zTOR, Rrup,
+                                                           Vs30, s_or_d,theta_or_phi,numSimperLoop)
+
+    def runSimulation(self):
+        """
+        return:
+        pulseComponnetsList-[pulse_comp1,pulse_comp2,returnPulseModelAcc,parameters_pulse]
+        noPulseComponnetsList-[noPulse_comp1,noPulse_comp2]
+        """
+        pulseComponnetsList,noPulseComponnetsList=self.nearFaultMotionSimInstance.runSimulation()
+        return pulseComponnetsList,noPulseComponnetsList
+
+    @staticmethod
+    def timeHistoryPlot(folderName, motionNumber=1):
+        """
+        plot acceleration, velocity and displacement time histories. time interval is 0.005 s
+        ----------------------------------------------------------------------------------------------------------------
+        folderName(str)-the folder name that sotore generated motions
+        motionNumber(int)-the number of motion to be plotted
+        """
+        from .nearFaultGroundMotionSimulation_twoComponents.nearFaultGroundMotionSimulation import timeHistoryPlot
+        timeHistoryPlot(folderName=folderName, motionNumber=motionNumber)
+
+    @staticmethod
+    def responseSpectraPlot(folderName, maxPeriod=10, beta=0.05, logCoord=True, SaLim=[0.01, 10], SvLim=[0.01, 500],
+                            SdLim=[0.001, 500]):
+        """
+        plot acceleration, velocity and displacement response spectra. time interval is 0.005 s
+        ----------------------------------------------------------------------------------------------------------------
+        folderName(str)-the folder name that sotore generated motions
+        maxPeriod(float)-the maximum period for response spectra plotting
+        beta(float)-damping ratio, default value is 0.05
+        lodCoord(bool)-Base-10 logarithmic coordinates, the default Value is True
+        SaLim,SvLim,SdLim(list)-the minimum and maximum value for y coordinate
+        """
+        from .nearFaultGroundMotionSimulation_twoComponents.nearFaultGroundMotionSimulation import responseSpectraPlot
+        responseSpectraPlot(folderName=folderName, maxPeriod=maxPeriod, beta=beta, logCoord=logCoord, SaLim=SaLim,
+                            SvLim=SvLim, SdLim=SdLim)
 ########################################################################################################################
 ########################################################################################################################
 if __name__ == "__main__":
@@ -2045,21 +2210,21 @@ if __name__ == "__main__":
     # print(len(acc),len(vel))
     ###################################################################################################
     ###---shake table test
-    # shakeInstance=ShakeTableTest()
-    # scaleRatioDict = shakeInstance.scaleRatio(lengthRatio=0.2, stressRatio=0.3, acceleratioRatio=1)
-    # print(scaleRatioDict)
-    # times=np.loadtxt("WN_Responses/1-WN-times.txt")
-    # acc_1_AX5=np.loadtxt("WN_Responses/1-WN-T1-5-AX.txt")
-    # acc_1_AX1 = np.loadtxt("WN_Responses/1-WN-T1-1-AX.txt")
-    # acc_1_AX3 = np.loadtxt("WN_Responses/1-WN-T1-3-AX.txt")
-    # acc_1_AX4 = np.loadtxt("WN_Responses/1-WN-T1-4-AX.txt")
-    # acc_1_GAX1=np.loadtxt("WN_Responses/1-WN-GAX-1.txt")
-    # pltHandle=shakeInstance.plotAcc([times,times,times,times],[acc_1_AX5,acc_1_AX4,acc_1_AX3,acc_1_AX1],
-    #                                 labelsList=['T1-5-AX','T1-4-AX','T1-3-AX','T1-1-AX'])
-    # pltHandle.show()
-    # dt=times[1]-times[0]
-    # pltHandle=shakeInstance.freResFunc(dt,3,acc_1_AX5,[acc_1_AX1],['1'],10,90)
-    # pltHandle.show()
+    shakeInstance=ShakeTableTest()
+    scaleRatioDict = shakeInstance.scaleRatio(lengthRatio=0.2, stressRatio=0.3, acceleratioRatio=1)
+    print(scaleRatioDict)
+    times=np.loadtxt("WN_Responses/1-WN-times.txt")
+    acc_1_AX5=np.loadtxt("WN_Responses/1-WN-T1-5-AX.txt")
+    acc_1_AX1 = np.loadtxt("WN_Responses/1-WN-T1-1-AX.txt")
+    acc_1_AX3 = np.loadtxt("WN_Responses/1-WN-T1-3-AX.txt")
+    acc_1_AX4 = np.loadtxt("WN_Responses/1-WN-T1-4-AX.txt")
+    acc_1_GAX1=np.loadtxt("WN_Responses/1-WN-GAX-1.txt")
+    pltHandle=shakeInstance.plotAcc([times,times,times,times],[acc_1_AX5,acc_1_AX4,acc_1_AX3,acc_1_AX1],
+                                    labelsList=['T1-5-AX','T1-4-AX','T1-3-AX','T1-1-AX'])
+    pltHandle.show()
+    dt=times[1]-times[0]
+    pltHandle=shakeInstance.freResFunc(dt,3,acc_1_AX5,[acc_1_AX1],['1'],10,90)
+    pltHandle.show()
     ####################################################################################################################
     ######---力与位移滞回响应分析
     # hystereticInstance=HystereticResponseAnalyses()
