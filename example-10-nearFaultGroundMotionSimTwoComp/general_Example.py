@@ -71,13 +71,12 @@ numSimMotions=100 ###-total number of simulated ground motions
 ########################################################################################################################
 ########################################################################################################################
 ##--plot time history
-# folderName=os.path.abspath(f"generalMotions")
-# motionNumber=8
-# NearFaultGroundMotionSim_twoComp.timeHistoryPlot(folderName,motionNumber)
-########################################################################################################################
-########################################################################################################################
-###---plot response spectra
 folderName=os.path.abspath(f"generalMotions")
-NearFaultGroundMotionSim_twoComp.responseSpectraPlot(folderName=folderName,maxPeriod=6,beta=0.05,
-                                    logCoord=True,SaLim=[0.01,5],SvLim=[0.01,400],SdLim=[0.001,300])
-
+motionNumber=2
+NearFaultGroundMotionSim_twoComp.timeHistoryPlot(folderName,motionNumber)
+########################################################################################################################
+########################################################################################################################
+# ###---plot response spectra
+# folderName=os.path.abspath(f"generalMotions")
+# NearFaultGroundMotionSim_twoComp.responseSpectraPlot(folderName=folderName,maxPeriod=6,beta=0.05,
+#                                     logCoord=True,SaLim=[0.01,5],SvLim=[0.01,400],SdLim=[0.001,300])

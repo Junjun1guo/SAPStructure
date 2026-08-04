@@ -33,37 +33,37 @@ Vp=None ###-velocity pulse magnitude (cm/s), None means no specific value for Vp
 Tp=4.5 ###-velocity pulse period (s), None means no specific value for Tp
 ########################################################################################################################
 ########################################################################################################################
-# folderName=f"Vp={Vp}_Tp={Tp}" ###-folder name
-# if os.path.exists(folderName):
-#     shutil.rmtree(folderName)
-# os.makedirs(folderName)
-# for i1 in range(numSimMotions):
-# 	print(f"Current simulation number {i1+1}!")
-# 	while True:
-# 		###-moment magnitude of an Earthquake, [5.5,7.9]
-# 		moment = np.random.uniform(5.5, 7.9)
-# 		###-unit,km,the closest distance from the site to the fault rupture in kilometers, [0.07,31]
-# 		Rrup = np.random.uniform(5,5.1)
-# 		###-unit,km,directivity parameters s or d (input the large of s and d), [1.2,135]
-# 		s_or_d = np.random.uniform(30, 30)
-# 		###-unit,degreens,directivity angle theta or phi (input corresponding to s_or_d) [0,90]
-# 		theta_or_phi = np.random.uniform(45, 45)
-# 		###-unit:m, site soil shear wave average velocity over the top 30 meters in meters per second,[139,2016]
-# 		Vs30 = np.random.uniform(1000,1001)
-# 		###-type of faulting,including ["strikeSlip","reverseAndReverseOblique"]
-# 		faultType = "strikeSlip"
-# 		###-unit:km, depth to the top of the rupture plane in kilometers, larger or equal to 0
-# 		zTOR = 0
-# 		numSimMotions_perLoop = 1
-# 		nearFaultMotionSimInstance =NearFaultGroundMotionSim_twoComp_specificPulseParas(faultType,moment, zTOR, Rrup,
-# 									Vs30, s_or_d,theta_or_phi,numSimMotions_perLoop)
-# 		pulseComponnetsList, pulseParas = nearFaultMotionSimInstance.runSpecificPulseMotion(Vp=Vp,Tp=Tp)
-# 		if pulseComponnetsList is not None:
-# 			np.savetxt(folderName+"/"+str(i1+1)+"_pulseComp.txt",np.asmatrix(pulseComponnetsList[0][0]).T,fmt="%.6f")
-# 			np.savetxt(folderName+"/"+str(i1+1)+"_orthogComp.txt",np.asmatrix(pulseComponnetsList[0][1]).T,fmt="%.6f")
-# 			np.savetxt(folderName+"/"+str(i1+1)+"_pulseModel.txt",np.asmatrix(pulseComponnetsList[0][2]).T,fmt="%.6f")
-# 			np.savetxt(folderName + "/" + str(i1 + 1) + "_pulseParas.txt", np.asmatrix(pulseParas).T,fmt="%.6f")
-# 			break
+folderName=f"Vp={Vp}_Tp={Tp}" ###-folder name
+if os.path.exists(folderName):
+    shutil.rmtree(folderName)
+os.makedirs(folderName)
+for i1 in range(numSimMotions):
+	print(f"Current simulation number {i1+1}!")
+	while True:
+		###-moment magnitude of an Earthquake, [5.5,7.9]
+		moment = np.random.uniform(5.5, 7.9)
+		###-unit,km,the closest distance from the site to the fault rupture in kilometers, [0.07,31]
+		Rrup = np.random.uniform(5,5.1)
+		###-unit,km,directivity parameters s or d (input the large of s and d), [1.2,135]
+		s_or_d = np.random.uniform(30, 30)
+		###-unit,degreens,directivity angle theta or phi (input corresponding to s_or_d) [0,90]
+		theta_or_phi = np.random.uniform(45, 45)
+		###-unit:m, site soil shear wave average velocity over the top 30 meters in meters per second,[139,2016]
+		Vs30 = np.random.uniform(1000,1001)
+		###-type of faulting,including ["strikeSlip","reverseAndReverseOblique"]
+		faultType = "strikeSlip"
+		###-unit:km, depth to the top of the rupture plane in kilometers, larger or equal to 0
+		zTOR = 0
+		numSimMotions_perLoop = 1
+		nearFaultMotionSimInstance =NearFaultGroundMotionSim_twoComp_specificPulseParas(faultType,moment, zTOR, Rrup,
+									Vs30, s_or_d,theta_or_phi,numSimMotions_perLoop)
+		pulseComponnetsList, pulseParas = nearFaultMotionSimInstance.runSpecificPulseMotion(Vp=Vp,Tp=Tp)
+		if pulseComponnetsList is not None:
+			np.savetxt(folderName+"/"+str(i1+1)+"_pulseComp.txt",np.asmatrix(pulseComponnetsList[0][0]).T,fmt="%.6f")
+			np.savetxt(folderName+"/"+str(i1+1)+"_orthogComp.txt",np.asmatrix(pulseComponnetsList[0][1]).T,fmt="%.6f")
+			np.savetxt(folderName+"/"+str(i1+1)+"_pulseModel.txt",np.asmatrix(pulseComponnetsList[0][2]).T,fmt="%.6f")
+			np.savetxt(folderName + "/" + str(i1 + 1) + "_pulseParas.txt", np.asmatrix(pulseParas).T,fmt="%.6f")
+			break
 ########################################################################################################################
 ########################################################################################################################
 ###---plot time history

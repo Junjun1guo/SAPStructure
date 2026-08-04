@@ -515,8 +515,6 @@ plt.savefig("groundMotionSpectrum.eps")
 plt.show()
 
 	
-	
-	
 		
 		
 		
